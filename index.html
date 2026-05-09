@@ -210,7 +210,10 @@ const I18N = {
     'hint.hide': 'Hide hint',
     'hint.loading': 'Thinking...',
     'hint.label': 'Coach',
-    'hint.fail': 'Hint failed. Try again.'
+    'hint.fail': 'Hint failed. Try again.',
+    'lvl.l1': 'L1 Standard (12)',
+    'lvl.l2': 'L2 Root (6)',
+    'lvl.l3': 'L3 Emotional (8)'
   },
   zh: {
     'header.roleplay':  ['角色扮演', '练到反射 才算会'],
@@ -272,21 +275,45 @@ const I18N = {
     'hint.hide': '隐藏提示',
     'hint.loading': '思考中...',
     'hint.label': '教练',
-    'hint.fail': '提示生成失败 请重试'
+    'hint.fail': '提示生成失败 请重试',
+    'lvl.l1': 'L1 标准 (12)',
+    'lvl.l2': 'L2 根源 (6)',
+    'lvl.l3': 'L3 情绪 (8)'
   }
 };
 
-// ============ Data: Scenarios ============
+// ============ Data: Scenarios (26, one per persona) ============
 const SCENARIOS = [
-  { id: 'p3_price', level: 1, src: 'Persona 3', title_en: 'Price Sensitive Customer', title_zh: '价格敏感客户', profile_en: 'Mid-30s, can afford but cautious. Done basic facials elsewhere.', profile_zh: '三十多岁 能负担但谨慎 之前在别家做过基础护理', concern_en: 'Wants change but feels guilty spending on self.', concern_zh: '想改变但花钱在自己身上有罪恶感', open_en: 'Eight thousand eight hundred for this package? That is too expensive. The clinic next door only charges four something for similar treatments.', open_zh: '你们这个项目八千八啊 太贵了吧 我隔壁那家才四千多 效果不也差不多' },
-  { id: 'p6_try', level: 1, src: 'Persona 6', title_en: 'Wants to Try First', title_zh: '想先试一下', profile_en: 'New customer. Low to medium budget. Soft and uncertain.', profile_zh: '新客户 预算低到中 性格偏软 不确定', concern_en: 'Afraid of committing to the wrong treatment.', concern_zh: '怕选错方案 不敢承诺', open_en: 'Can I just try one session first? I am not sure if this will work for me.', open_zh: '我先试一次可以吗 我不确定这个适不适合我' },
-  { id: 'p7_compete', level: 1, src: 'Persona 7', title_en: 'Competitor Shopper', title_zh: '比价客户', profile_en: 'Compares everywhere. Just wants the best deal.', profile_zh: '到处比价 只想要最划算的', concern_en: 'Needs strong positioning and unique value to commit.', concern_zh: '需要强定位和独特价值才会下决定', open_en: 'Other clinic is running a promo at half this price. Can you match it?', open_zh: '别家现在搞活动 半价就行了 你们能不能做到' },
-  { id: 'p8_husband', level: 1, src: 'Persona 8', title_en: 'Husband-Controlled', title_zh: '需要先问老公', profile_en: 'Submissive, anxious. Defers big decisions.', profile_zh: '比较顺从 焦虑 大决定不敢自己做', concern_en: 'Approval seeking. Feels selfish spending on self.', concern_zh: '寻求许可 觉得花钱在自己身上很自私', open_en: 'I need to ask my husband first. He handles the budget at home.', open_zh: '我得先问问我老公 家里都是他管钱' },
-  { id: 'p10_skeptic', level: 1, src: 'Persona 10', title_en: 'Skeptical Customer', title_zh: '怀疑型客户', profile_en: 'Tried and failed at many clinics. Guarded.', profile_zh: '在很多家试过都没用 戒心很重', concern_en: 'Fear of disappointment. Low institutional trust.', concern_zh: '怕再次失望 对机构信任度低', open_en: 'I do not trust clinics anymore. Last time they all just sold me packages and nothing worked.', open_zh: '我已经不相信美容院了 之前几家都是卖完套餐就没下文了 一点效果都没有' },
+  // === LEVEL 1: 12 standard personas ===
+  { id: 'p1_fix_now', level: 1, src: 'L1 Persona 1', title_en: 'I Must Fix This Now Buyer', title_zh: '"我必须现在搞定" 买家', profile_en: 'High buy tendency, RM6k-10k. Cooperative, hopeful, responds to authority.', profile_zh: '高购买意愿 预算 6-10k 配合 抱期待 对权威反应好', concern_en: 'Lost confidence after seeing photos of self. Wants results, ready to be led.', concern_zh: '看到自己照片之后失去自信 想要效果 愿意被引导', open_en: 'I keep seeing photos of myself recently and I look so much older than my friends. Which package is best for results?', open_zh: '最近老看到自己的照片 比朋友老好多 哪个套餐效果最好' },
+  { id: 'p2_emotional', level: 1, src: 'L1 Persona 2', title_en: 'Highly Emotional Insecure', title_zh: '高度情绪化 没自信', profile_en: 'Medium tendency, RM2k-5k. Sensitive, needs emotional validation.', profile_zh: '中等意愿 预算 2-5k 敏感 需要情绪认可', concern_en: 'Compares self to coworkers. Afraid results will not match expectations.', concern_zh: '总跟同事比 怕效果达不到预期', open_en: 'I have been thinking about this for a while but I am not sure if it will work for me. Let me think about it more.', open_zh: '我考虑很久了 但不确定适不适合我 让我再想想吧' },
+  { id: 'p3_price', level: 1, src: 'L1 Persona 3', title_en: 'Price Sensitive Customer', title_zh: '价格敏感客户', profile_en: 'Mid-30s, RM1k-3k budget. Practical, cautious. Can afford but feels guilty.', profile_zh: '三十多岁 预算 1-3k 实际 谨慎 能负担但有罪恶感', concern_en: 'Wants change but feels guilty spending on self.', concern_zh: '想改变但花钱在自己身上有罪恶感', open_en: 'Eight thousand eight hundred for this package? That is too expensive. The clinic next door only charges four something for similar treatments.', open_zh: '你们这个项目八千八啊 太贵了吧 我隔壁那家才四千多 效果不也差不多' },
+  { id: 'p4_logical', level: 1, src: 'L1 Persona 4', title_en: 'Logical Analytical Engineer', title_zh: '理性分析型 工程师', profile_en: 'Medium tendency, RM3k-8k. Asks technical questions. Needs rational justification.', profile_zh: '中等意愿 预算 3-8k 问技术问题 需要理性依据', concern_en: 'Wants clarity on mechanism and why it works.', concern_zh: '想搞清楚原理和为什么有效', open_en: 'Can you explain how this treatment actually works at a scientific level? What is the mechanism?', open_zh: '能跟我说说这个治疗的科学原理吗 具体是什么机制' },
+  { id: 'p5_busy_exec', level: 1, src: 'L1 Persona 5', title_en: 'Busy Corporate Executive', title_zh: '忙碌的企业高管', profile_en: 'High tendency, RM5k-15k. Direct, impatient, time-poor.', profile_zh: '高购买意愿 预算 5-15k 直接 没耐心 时间紧', concern_en: 'Tired-looking face. Needs a plan that fits her schedule.', concern_zh: '脸看起来疲惫 需要适合她日程的方案', open_en: 'Listen, I have ten minutes. Tell me what works fastest with the least downtime. I do not have time for monthly visits.', open_zh: '我只有十分钟 跟我说哪个见效最快恢复期最短 我没空每个月来' },
+  { id: 'p6_try', level: 1, src: 'L1 Persona 6', title_en: 'Wants to Try First', title_zh: '想先试一下', profile_en: 'New customer. Low to medium budget. Soft and uncertain.', profile_zh: '新客户 预算低到中 性格偏软 不确定', concern_en: 'Afraid of committing to the wrong treatment.', concern_zh: '怕选错方案 不敢承诺', open_en: 'Can I just try one session first? I am not sure if this will work for me.', open_zh: '我先试一次可以吗 我不确定这个适不适合我' },
+  { id: 'p7_compete', level: 1, src: 'L1 Persona 7', title_en: 'Competitor Shopper', title_zh: '比价客户', profile_en: 'Compares everywhere. Just wants the best deal.', profile_zh: '到处比价 只想要最划算的', concern_en: 'Needs strong positioning and unique value to commit.', concern_zh: '需要强定位和独特价值才会下决定', open_en: 'Other clinic is running a promo at half this price. Can you match it?', open_zh: '别家现在搞活动 半价就行了 你们能不能做到' },
+  { id: 'p8_husband', level: 1, src: 'L1 Persona 8', title_en: 'Husband-Controlled', title_zh: '需要先问老公', profile_en: 'Submissive, anxious. Defers big decisions.', profile_zh: '比较顺从 焦虑 大决定不敢自己做', concern_en: 'Approval seeking. Feels selfish spending on self.', concern_zh: '寻求许可 觉得花钱在自己身上很自私', open_en: 'I need to ask my husband first. He handles the budget at home.', open_zh: '我得先问问我老公 家里都是他管钱' },
+  { id: 'p9_ig_girl', level: 1, src: 'L1 Persona 9', title_en: 'Young Instagram Girl', title_zh: '年轻 IG 女孩', profile_en: 'Med-high tendency, RM1.5k-3k. Impulsive, fast decisions.', profile_zh: '中高意愿 预算 1.5-3k 冲动 快速决定', concern_en: 'Acne and texture. Wants Instagram-ready glow.', concern_zh: '痘痘和皮肤纹理 想要 ins 级光泽感', open_en: 'My friend goes to another clinic and got amazing glow for cheaper. Why is yours more expensive?', open_zh: '我朋友在另一家做的 效果超好还便宜 你们为什么这么贵' },
+  { id: 'p10_skeptic', level: 1, src: 'L1 Persona 10', title_en: 'Skeptical Customer', title_zh: '怀疑型客户', profile_en: 'Tried and failed at many clinics. Guarded.', profile_zh: '在很多家试过都没用 戒心很重', concern_en: 'Fear of disappointment. Low institutional trust.', concern_zh: '怕再次失望 对机构信任度低', open_en: 'I do not trust clinics anymore. Last time they all just sold me packages and nothing worked.', open_zh: '我已经不相信美容院了 之前几家都是卖完套餐就没下文了 一点效果都没有' },
+  { id: 'p11_premium', level: 1, src: 'L1 Persona 11', title_en: 'Premium Buyer', title_zh: '高端买家', profile_en: 'Very high tendency, RM8k-20k. Confident, decisive.', profile_zh: '极高意愿 预算 8-20k 自信 决断力强', concern_en: 'Wants to maintain youth. Will buy if consultant maintains strong frame.', concern_zh: '想维持年轻 顾问只要保持框架就会买', open_en: 'I want the best you have. What is the most premium plan, and how soon can we start?', open_zh: '给我最好的方案 最高端的是哪个 最快什么时候开始' },
+  { id: 'p12_not_enough', level: 1, src: 'L1 Persona 12', title_en: 'I Do Not Feel Good Enough', title_zh: '"我觉得自己不够好"', profile_en: 'Medium tendency, RM1.5k-3k. Quiet, shy, deep insecurity.', profile_zh: '中等意愿 预算 1.5-3k 安静 害羞 深度自卑', concern_en: 'Always comparing self. Does not believe she deserves improvement.', concern_zh: '总在跟人比 不相信自己值得变好', open_en: 'I do not know... maybe this is too good for me. I have always had bad skin, I do not think it can really change.', open_zh: '我也不知道 可能这个我配不上 我皮肤一直都很差 我不觉得真能改变' },
+
+  // === LEVEL 2: 6 root cause shifts ===
+  { id: 'l2_1_money_fear', level: 2, src: 'L2 #1', title_en: 'Scared of Wasting Money', title_zh: '怕浪费钱', profile_en: 'Past financial regret. Fear is bigger than price.', profile_zh: '过去花钱后悔过 怕的不是钱是后悔', concern_en: 'Wants safety from making another wrong decision.', concern_zh: '想确保不再做错决定', open_en: 'I have spent a lot on treatments before that did not work. I cannot afford to waste money again. How do I know this is different?', open_zh: '我以前花了很多钱在没效果的疗程上 我没法再浪费一次了 我怎么知道这个不一样' },
   { id: 'l2_2_trust', level: 2, src: 'L2 #2', title_en: 'Do Not Trust Clinics', title_zh: '不相信美容院', profile_en: 'Past trauma. Tells you another clinic is better.', profile_zh: '过去有阴影 一直说别家更好', concern_en: 'Trauma from past, low trust. Surface objection is comparison.', concern_zh: '过去的创伤导致信任度低 表面异议是比较', open_en: 'That other clinic has a better doctor than yours. And their promo is cheaper. Why should I do it here?', open_zh: '另外那家的医生比你们好 价格也更便宜 我为什么要在你们这里做' },
   { id: 'l2_3_results', level: 2, src: 'L2 #3', title_en: 'What If No Results', title_zh: '怕没效果', profile_en: 'Repeats "will it work". Fear of failure.', profile_zh: '反复问会不会有效 怕失败', concern_en: 'Does not trust outcome, does not trust own ability to commit.', concern_zh: '不相信结果 也不相信自己能坚持', open_en: 'I want to see fast results. Last time I did treatments for months and saw nothing. Can you guarantee this works?', open_zh: '我想要快速看到效果 上次我做了几个月一点变化都没有 你能保证这次有效果吗' },
+  { id: 'l2_4_schedule', level: 2, src: 'L2 #4', title_en: 'Cannot Commit to Schedule', title_zh: '没法坚持时间表', profile_en: 'Identity issue around consistency. Says busy, real fear is failure to stick.', profile_zh: '关于坚持的身份认同问题 说自己忙 真正怕的是坚持不下来', concern_en: 'Has started routines before and stopped. Self-distrust.', concern_zh: '之前开始过又放弃了 不相信自己', open_en: 'Honestly, I am very busy. I might come once or twice and then not come anymore. Maybe I should not commit to a long plan.', open_zh: '说实话我很忙 可能来一两次就不来了 可能不应该签长期方案' },
+  { id: 'l2_5_husband_strict', level: 2, src: 'L2 #5', title_en: 'Husband Very Strict', title_zh: '老公管得严', profile_en: 'Approval-seeking. Defers all spending decisions to husband.', profile_zh: '寻求许可型 所有花钱决定都让老公定', concern_en: 'Feels guilty spending on self. Worries about kids needing money.', concern_zh: '为自己花钱有罪恶感 担心孩子还需要钱', open_en: 'I really want to do this but my husband watches our budget closely. The kids also need things. I feel guilty spending this much on myself.', open_zh: '我真的很想做 但我老公很会算账 孩子也要钱 给自己花这么多我有罪恶感' },
+  { id: 'l2_6_disappointed', level: 2, src: 'L2 #6', title_en: 'Do Not Want to Be Disappointed Again', title_zh: '不想再失望', profile_en: 'Emotional protection mode. Overwhelmed when pressed.', profile_zh: '情绪保护状态 被推就崩', concern_en: 'Has been hurt before by overpromised treatments.', concern_zh: '之前被夸大的疗程伤过', open_en: 'I have heard all this before from other clinics. Every time they promise and every time I am disappointed. I cannot keep doing this.', open_zh: '这些话我在别家都听过了 每次承诺每次失望 我没法再这样下去了' },
+
+  // === LEVEL 3: 8 emotional types ===
+  { id: 'l3_a_defensive', level: 3, src: 'L3 Type A', title_en: 'Defensive or Irritated', title_zh: '防御或烦躁', profile_en: 'Edge in voice. Sales style triggered her.', profile_zh: '语气带刺 被销售方式刺到', concern_en: 'Feels pushed. Will close down if approached wrong.', concern_zh: '觉得被推 接近方式不对就关上门', open_en: 'Why are you asking me so many questions? I just came in for information, I do not need this whole consultation thing.', open_zh: '你怎么问这么多问题 我就是来看看的 不用搞这一套吧' },
   { id: 'l3_b_angry', level: 3, src: 'L3 Type B', title_en: 'Angry About Price', title_zh: '对价格发火', profile_en: 'Customer is heated. Feels overcharged or manipulated.', profile_zh: '情绪激动 觉得被宰或被套路', concern_en: 'Emotional reaction to price. Black tortoise pattern.', concern_zh: '对价格的情绪反应 容易让顾问慌', open_en: 'This price is crazy. Do you think I am stupid? You all just mark up so high.', open_zh: '这个价格简直离谱 你当我傻吗 你们就是乱加价' },
   { id: 'l3_c_stop', level: 3, src: 'L3 Type C', title_en: 'Stop Selling Me', title_zh: '别推销我', profile_en: 'Frame battle. Customer pushing back hard.', profile_zh: '心理博弈 客户强势顶回来', concern_en: 'Fed up with sales pitch. Wants advisor, not seller.', concern_zh: '受够了推销话术 想要顾问 不是销售员', open_en: 'Stop selling me. I came here for a consultation, not to be pressured into a package.', open_zh: '别再推销了 我来咨询的 不是来被你们压套餐的' },
+  { id: 'l3_d_insecure', level: 3, src: 'L3 Type D', title_en: 'Insecure Reacts Harshly', title_zh: '没安全感 反应激烈', profile_en: 'Hurt, not angry. Misreads questions as criticism.', profile_zh: '是受伤 不是生气 把问题当批评', concern_en: 'Feels her face is being criticised. Defensive about appearance.', concern_zh: '感觉脸被评判 对外貌防御', open_en: 'You think my face is so bad that I need all this? Why do you keep pointing out my problems?', open_zh: '你觉得我的脸有那么差需要做这么多吗 你怎么一直说我哪里不好' },
+  { id: 'l3_e_silent', level: 3, src: 'L3 Type E', title_en: 'Cold, Silent, Uninterested', title_zh: '冷淡 沉默 不感兴趣', profile_en: 'Withdrawn. Hidden objection she will not voice.', profile_zh: '抽离状态 有隐藏异议但不说', concern_en: 'Something is wrong but she will not say. Common withdrawal pattern.', concern_zh: '有什么不对劲但不说 常见的退缩模式', open_en: 'Mmm... yeah... ok. (Looks at phone, very short answers, avoids eye contact)', open_zh: '嗯 哦 好 (看手机 短回应 不对视)' },
+  { id: 'l3_f_challenge', level: 3, src: 'L3 Type F', title_en: 'Challenges Your Expertise', title_zh: '挑战你的专业', profile_en: 'Tests authority. Knows a bit, wants to verify you know more.', profile_zh: '测试权威 自己懂一点 想验证你懂得更多', concern_en: 'Will commit only if she trusts you actually know what you are doing.', concern_zh: '只有相信你真懂才会下决定', open_en: 'I have read about this online and my friend in another clinic says different. How are you so sure this works?', open_zh: '我在网上查过 我在别家做的朋友说法不一样 你怎么这么确定有效' },
+  { id: 'l3_g_dominate', level: 3, src: 'L3 Type G', title_en: 'Tries to Dominate Consultant', title_zh: '想压制顾问', profile_en: 'Wants control. Demands price first, fast, no consultation.', profile_zh: '想掌控 一上来要价格 要快 不要咨询', concern_en: 'Will respect consultant if frame is held. Will steamroll if it is not.', concern_zh: '顾问站住框架就尊重 站不住就被推平', open_en: 'Skip the introduction. Just give me your best price. Do not waste my time with consultation.', open_zh: '别介绍了 直接给最低价 别浪费时间咨询' },
   { id: 'l3_h_emotional', level: 3, src: 'L3 Type H', title_en: 'Emotional Customer', title_zh: '情绪化客户', profile_en: 'Postpartum, breakup, aging anxiety. Vulnerable.', profile_zh: '产后 分手 衰老焦虑 处于脆弱状态', concern_en: 'Needs containment and care, not pitch.', concern_zh: '需要被接住和照顾 不是推销', open_en: 'I look in the mirror and I do not recognize myself anymore. I do not know what to do.', open_zh: '我照镜子的时候都不认识自己了 我不知道该怎么办' }
 ];
 
@@ -399,7 +426,7 @@ const L3_EMO = [
 const STATE = {
   lang: 'en', tab: 'roleplay', scenario: null, conversation: [], voiceTranscript: '',
   recording: false, recognition: null, knowledgeView: '4d', knowledgeCat: 'frame',
-  knowledgeSearch: '', busy: false, lastRaw: ''
+  knowledgeSearch: '', busy: false, lastRaw: '', pendingReplyText: '', scenarioLevel: 1
 };
 
 // ============ Storage ============
@@ -448,41 +475,89 @@ ${summarizePersonas()}
 === 6R CUSTOMER JOURNEY ===
 ${summarize6R()}
 
-=== MARKET CONTEXT (May 2026 Strategic Diagnosis) ===
+=== EXECUTIVE SUMMARY: SALES TEAM PROBLEM AND GAP (May 2026, latest from Notion) ===
 
-Market shift: Aesthetic medical industry has moved from BEAUTY DESIRE (where relationship + package selling worked) to MEDICAL TRUST (where regulation, safety, fear conversion, doctor authority dominate).
+CORE PROBLEM:
+The sales team is still selling through relationship, explanation, comfort, and package pushing. But the market has shifted into fear, regulation, safety, documentation, and medical trust. So the sales method is mismatched with the current business battlefield.
 
-Old market customer wanted: results, package, promotion, beauty desire fulfilled.
-New market customer wants: regulation, fear addressed, medical trust, compliance, safety, defensibility.
+Their communication is too broad, too soft, and too explanation heavy. The message does not create enough certainty or urgency to close. They try to keep customers comfortable - useful for service, weak for qualification and closing. Their wording can damage the deal: wrong explanation creates doubt, fear, compliance risk, or weak trust. They act as representatives of the brand but lack a stronger authority based script.
 
-Sales team's current behaviour (the gap): They are still selling through relationship, explanation, comfort, package pushing. Their default tool is relationship + soft pressure, regardless of customer context.
+MARKET MISMATCH:
+The market now wants authority, safety, proof, and structure. The team is still operating through flow, relationship, comfort, and adjustment. The market now demands clarity, rules, process, confidence, and evidence. That is the mismatch.
 
-EVIDENCE OF THE GAP (numbers do not lie):
+EVIDENCE (numbers do not lie):
 - Low consult-to-enrollment conversion for new customers. Means they cannot close without a relationship to lean on.
 - Rising refund rate WITHOUT service complaints. Means they over-pressure existing relationships and customers feel pushed, not served.
 - Pattern shows: 1-tool sales method while sitting on a 40-card 4D library.
 
-THE 7 SPECIFIC GAPS:
-1. They cannot sell SAFETY clearly (know how to sell treatment benefits, not medical safety, screening, suitability, doctor assessment).
-2. They lack COMPLIANCE LANGUAGE (careless wording becomes operational risk - the Harm Door risk).
-3. They OVEREXPLAIN instead of directing (Ren over Ding pattern - too much talking, customer gets info but less certainty).
-4. They lack STRUCTURED QUALIFICATION (do not filter who is suitable, who needs doctor review, who should not proceed).
-5. They are weak at FEAR CONVERSION (do not know how to convert fear into trust through proof and process, only through comfort).
-6. They are still PROMOTION-TRAINED (sell price, package, discount, relationship - not authority, diagnosis, risk control, protocol).
-7. They are not acting as CLINICAL ADVISORY BRIDGE (still behaving as beauty consultants, not as the bridge between customer concern and doctor-led decision).
+THE 7 MAIN GAPS:
+1. They cannot sell safety clearly. They know how to sell treatment benefits, not medical safety, screening, suitability, doctor assessment.
+2. They lack compliance language. Casual answers become operational risk.
+3. They overexplain instead of directing. Customer gets more information, less certainty.
+4. They lack structured qualification. Cannot filter who is suitable, who needs doctor review, who should not proceed, who is ready to buy.
+5. They are weak at fear conversion. Do not know how to turn customer fear (safety, price, regulation, trust, market noise) into trust.
+6. They are still promotion trained. Strong on price, package, discount, relationship. Weak on authority, diagnosis, risk control, proper protocol.
+7. They are not acting as a clinical advisory bridge. Still behaving as beauty consultants, not the bridge between customer concern and doctor led decision.
 
-WHY THIS MATTERS FOR GRADING:
-When you grade, do not only score on tactical 4D moves. Where appropriate, connect a tactical failure to one of these 7 broader gaps. Example: if salesperson over-explains in response to a safety question, this is gap #3 (overexplain instead of directing) and gap #1 (cannot sell safety clearly). Naming the broader gap helps coaches see the pattern, not just the moment.
+RAW DIAGNOSIS:
+The team is not useless. They are built for the previous market (beauty desire, promotion, package, results, relationship). The current market is regulation, fear, medical trust, compliance, safety, defensibility. That is the gap.
+
+WHY THIS MATTERS FOR YOUR GRADING:
+When you grade, do not only score on tactical 4D moves. Where appropriate, connect a tactical failure to one of these 7 gaps. Example: if salesperson over-explains in response to a safety question, this is gap #3 (overexplain instead of directing) and gap #1 (cannot sell safety clearly). Naming the broader gap helps coaches see the pattern, not just the moment.
 
 THE NEW SALES OPERATING SYSTEM THEY NEED:
 1. Approved script (named 4D cards)
-2. Compliance-safe wording
+2. Compliance safe wording
 3. Customer qualification checklist before pricing
 4. Doctor escalation rule (when in doubt, escalate)
 5. Fear handling framework (proof and process, not comfort)
 6. Treatment suitability explanation
 7. Closing script based on safety and trust
 8. Strict control on claims and promises (no medical guarantees)
+
+BOTTOM LINE:
+The problem is not only skill. It is the wrong sales architecture for the new regulatory environment. They are still selling like beauty salespeople. They now need to sell like structured clinical consultants with controlled language, stronger qualification, and authority backed confidence.
+
+=== TEACHING PHILOSOPHY: Cards are flexible, sequence is sacred ===
+
+CORE PRINCIPLE:
+The 4D system is not a quiz with one right answer per situation. It is a flexible toolkit. For any given customer moment, MULTIPLE card combinations are valid. What matters is the SEQUENCE, not the specific card choice.
+
+THE SEQUENCE (the part that is non-negotiable):
+1. FRAME first (set the consultation tone for this customer type)
+2. VALUE before price (build worth before mentioning numbers)
+3. ROOT before reframe (uncover real fear, do not just answer surface objection)
+4. CLOSE with intention (use a named close, not relationship pressure)
+
+Within this sequence, MANY combinations work. Examples of valid paths for the same customer:
+
+For a price-sensitive customer:
+- Path A: Authoritative Frame -> Value Anchoring (ROI) -> Choice Close. Solid, structured.
+- Path B: Pain Uncovering Frame -> Premium Standard Value -> Goal Anchored Close. Emotional anchor.
+- Path C: Empowerment Frame -> Customisation Value -> Soft Close (Enrollment). Lower commitment, secure next visit.
+- Path D: Competitive Frame -> Treatment Plan Value -> Walkaway Authority Close. If she truly cannot afford.
+
+All four paths are valid. A skilled consultant has 3+ paths in pocket.
+
+What is NOT valid (the actual gap):
+- No frame, jump straight to package -> relationship pressure -> hope to close.
+- This is what the team currently does. This is what we are training out.
+
+YOUR JOB AS COACH:
+When grading, do NOT prescribe one right card. Do this instead:
+
+1. Acknowledge what the staff DID and which cards their words map to (even if imperfect).
+2. Identify which step of the sequence they SKIPPED (frame? value? root? close?).
+3. Show 2 or 3 ALTERNATIVE valid paths they could have taken, using DIFFERENT card combinations.
+4. Highlight the principle: any cards work as long as the sequence is followed.
+
+This teaches JUDGMENT, not memorization. Staff who learn judgment can handle customers we never wrote scenarios for. Staff who memorize 1 right answer per scenario will fail in the wild.
+
+WHEN GIVING COACH HINTS (mid-drill):
+Show 2-3 cards that could work for this moment, plus the principle. Not "use X". Instead "any of A, B, or C would work, the principle is Y."
+
+WHEN GRADING (post-drill):
+In each feedback item, name the dimension (profile/root/reframe/close_dim/authority), describe what the staff did, then show alternative valid paths. End with the underlying principle.
 
 === YOUR MODES ===
 
@@ -553,11 +628,17 @@ ${items.map((s, i) => `[${i}] ${s}`).join('\n')}`;
 async function translateActiveContent(targetLang) {
   const items = [];
   const refs = [];
-  if (STATE.tab === 'roleplay' && STATE.scenario && STATE.conversation.length > 0) {
-    STATE.conversation.forEach(m => {
-      if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); }
-      if (m.hintText) { items.push(m.hintText); refs.push({ obj: m, key: 'hintText' }); }
-    });
+  if (STATE.tab === 'roleplay' && STATE.scenario) {
+    if (STATE.conversation.length > 0) {
+      STATE.conversation.forEach(m => {
+        if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); }
+        if (m.hintText) { items.push(m.hintText); refs.push({ obj: m, key: 'hintText' }); }
+      });
+    }
+    if (STATE.pendingReplyText) {
+      items.push(STATE.pendingReplyText);
+      refs.push({ obj: STATE, key: 'pendingReplyText' });
+    }
   } else if (STATE.tab === 'voice' && STATE.voiceTranscript) {
     items.push(STATE.voiceTranscript);
     refs.push({ obj: STATE, key: 'voiceTranscript' });
@@ -682,7 +763,10 @@ function renderRoleplay() {
   const c = document.getElementById('content');
   if (!STATE.scenario) {
     const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
-    c.innerHTML = `${noKey}<div class="notice">${t('roleplay.intro')}</div><div class="scenario-grid">${SCENARIOS.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
+    const lvlBar = `<div class="cat-row" style="margin-bottom:10px;"><button class="cat-chip ${STATE.scenarioLevel === 1 ? 'active' : ''}" data-level="1">${t('lvl.l1')}</button><button class="cat-chip ${STATE.scenarioLevel === 2 ? 'active' : ''}" data-level="2">${t('lvl.l2')}</button><button class="cat-chip ${STATE.scenarioLevel === 3 ? 'active' : ''}" data-level="3">${t('lvl.l3')}</button></div>`;
+    const filtered = SCENARIOS.filter(s => s.level === STATE.scenarioLevel);
+    c.innerHTML = `${noKey}<div class="notice">${t('roleplay.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
+    c.querySelectorAll('[data-level]').forEach(b => { b.onclick = () => { STATE.scenarioLevel = parseInt(b.getAttribute('data-level'), 10); renderRoleplay(); }; });
     c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.conversation = [{ role: 'customer', text: tx(STATE.scenario.open_en, STATE.scenario.open_zh) }]; renderRoleplay(); }; });
     return;
   }
@@ -732,15 +816,20 @@ Scenario: ${STATE.scenario.title_en}. Customer profile: ${STATE.scenario.profile
 ${prevCustomer ? `Customer just said: "${prevCustomer.text}"` : ''}
 Sales replied: "${msg.text}"
 
-In ${langName}, give a short coach hint in EXACTLY this 3-line format. No extra prose. No JSON. No headings.
+In ${langName}, give a short coach hint in EXACTLY this format (see TEACHING PHILOSOPHY in your system prompt). No JSON, no headings, just plain text in this structure:
 
-Line 1 (Diagnose): one sentence on what was weak or strong about the sales reply
-Line 2 (4D Card): name a specific card from the 4D library to use here (e.g. "Use Root Card 2 - Fear of No Results" or "Use Elite Reframe 3")
-Line 3 (Better line): one example line the salesperson could say instead, in ${langName}, in quotes.
+Diagnose: one sentence on what the sales reply did or missed.
 
-Total under 80 words.`;
+Three valid paths from here:
+A) [Card name] -> [Card name]: "[example line]"
+B) [Card name] -> [Card name]: "[example line]"
+C) [Card name] -> [Card name]: "[example line]"
+
+Principle: one short sentence on the underlying rule (e.g. "Any close works after the right frame" or "Frame -> Value -> Close, in that order").
+
+Total under 130 words. Show options. Do NOT prescribe one answer. Teach judgment.`;
   let raw = '';
-  try { raw = await callClaude([{ role: 'user', content: userMsg }], 400); }
+  try { raw = await callClaude([{ role: 'user', content: userMsg }], 700); }
   catch (e) {
     if (e.message === 'NO_KEY') { showApiKeyModal(false); msg.hintLoading = false; renderRoleplay(); return; }
     raw = '';
@@ -810,14 +899,24 @@ Scenario: ${scenario.title_en}. Customer profile: ${scenario.profile_en}. Concer
 TRANSCRIPT:
 ${transcript}
 
+Score each dimension 0-2.
+
 Output exactly 3 feedback points. Each feedback is an OBJECT with:
 - "dim": exactly one of "profile" | "root" | "reframe" | "close_dim" | "authority"
-- "text": the coaching point in ${langName}, under 60 words. Must cite a specific moment from the transcript, name the 4D card the salesperson should have used, and where relevant connect to one of the 7 May gaps by number (e.g. "(May Gap #2 - lacks compliance language)").
+- "text": the coaching point in ${langName}, under 110 words.
+
+The "text" must follow this teaching format (see TEACHING PHILOSOPHY in your system prompt):
+1. Acknowledge what the salesperson did at a specific moment (cite the moment).
+2. Show 2-3 ALTERNATIVE valid paths they could have taken, using DIFFERENT 4D card combinations. Name the cards explicitly.
+3. End with the underlying principle (e.g. "Any of these works as long as you set the frame first" or "All three follow Frame -> Value -> Close").
+Where relevant, briefly connect the gap to one of the 7 May gaps by number, e.g. "(May Gap #5 - weak fear conversion)".
+
+Do NOT prescribe one right answer. Show options. Teach judgment.
 
 Required JSON format exactly:
 {"profile":N,"root":N,"reframe":N,"close_dim":N,"authority":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}`;
   let raw = '';
-  try { raw = await callClaude([{ role: 'user', content: userMsg }], 1500); }
+  try { raw = await callClaude([{ role: 'user', content: userMsg }], 2500); }
   catch (e) {
     if (e.message === 'NO_KEY') showApiKeyModal(false);
     raw = e.message;
@@ -850,7 +949,10 @@ function renderVoice() {
   const c = document.getElementById('content');
   if (!STATE.scenario) {
     const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
-    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div><div class="scenario-grid">${SCENARIOS.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('customer.opens')}: ${tx(s.open_en, s.open_zh)}</div></button>`).join('')}</div>`;
+    const lvlBar = `<div class="cat-row" style="margin-bottom:10px;"><button class="cat-chip ${STATE.scenarioLevel === 1 ? 'active' : ''}" data-level="1">${t('lvl.l1')}</button><button class="cat-chip ${STATE.scenarioLevel === 2 ? 'active' : ''}" data-level="2">${t('lvl.l2')}</button><button class="cat-chip ${STATE.scenarioLevel === 3 ? 'active' : ''}" data-level="3">${t('lvl.l3')}</button></div>`;
+    const filtered = SCENARIOS.filter(s => s.level === STATE.scenarioLevel);
+    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('customer.opens')}: ${tx(s.open_en, s.open_zh)}</div></button>`).join('')}</div>`;
+    c.querySelectorAll('[data-level]').forEach(b => { b.onclick = () => { STATE.scenarioLevel = parseInt(b.getAttribute('data-level'), 10); renderVoice(); }; });
     c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.voiceTranscript = ''; renderVoice(); }; });
     return;
   }
@@ -1022,13 +1124,22 @@ async function setLang(l) {
   document.getElementById('lang-en').classList.toggle('active', l === 'en');
   document.getElementById('lang-zh').classList.toggle('active', l === 'zh');
   applyHeaderTitle();
-  // If active session has dynamic AI content, translate it before re-render
-  const hasDynamic = (STATE.tab === 'roleplay' && STATE.scenario && STATE.conversation.length > 0) || (STATE.tab === 'voice' && STATE.voiceTranscript);
+  // Capture textarea value (typed but unsent reply) so we can translate and restore
+  const replyEl = document.getElementById('reply');
+  STATE.pendingReplyText = replyEl ? (replyEl.value || '') : '';
+  // If active session has dynamic AI content (or typed reply), translate it before re-render
+  const hasDynamic = (STATE.tab === 'roleplay' && STATE.scenario && (STATE.conversation.length > 0 || STATE.pendingReplyText)) || (STATE.tab === 'voice' && STATE.voiceTranscript);
   if (hasDynamic && loadKey()) {
     await translateActiveContent(l);
   }
   // Re-render current tab without resetting scenario state
   renderActiveTab();
+  // Restore translated typed reply into the new textarea
+  if (STATE.pendingReplyText) {
+    const newReplyEl = document.getElementById('reply');
+    if (newReplyEl) newReplyEl.value = STATE.pendingReplyText;
+    STATE.pendingReplyText = '';
+  }
 }
 
 // ============ Init ============

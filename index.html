@@ -126,6 +126,15 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 .expanded-feedback-loading { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-secondary); text-align: center; }
 .card-tag { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; font-size: 11px; padding: 3px 10px; background: var(--accent-bg); color: var(--accent); border-radius: 10px; margin-top: -4px; margin-bottom: 6px; font-weight: 500; }
 .card-tag::before { content: '🎴'; font-size: 11px; }
+.ask-coach-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-top: 14px; }
+.ask-coach-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.ask-coach-intro { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+.coach-msg { margin-bottom: 10px; }
+.coach-msg.user { display: flex; justify-content: flex-end; }
+.coach-msg.user .coach-bubble { background: var(--primary); color: var(--primary-text); }
+.coach-msg.ai .coach-bubble { background: var(--accent-bg); border: 1px solid #f0e1c8; color: #4a3a20; }
+.coach-bubble { max-width: 85%; padding: 10px 12px; border-radius: 14px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.coach-input-row { display: flex; gap: 6px; margin-top: 10px; }
 .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .modal { background: var(--surface); border-radius: var(--radius); padding: 20px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
 .modal h2 { font-size: 17px; margin-bottom: 8px; }
@@ -246,7 +255,15 @@ const I18N = {
     'mic.unsupported': 'Speech recognition not supported. Use Chrome or Safari.',
     'mic.denied': 'Microphone permission denied',
     'continue.chat': 'Continue this conversation',
-    'continue.note': 'Resumes from where you left off. New grade will save as a separate record.'
+    'continue.note': 'Resumes from where you left off. New grade will save as a separate record.',
+    'treatment.label': 'Treatment',
+    'treatment.note': 'Picked treatment',
+    'opening.loading': 'Customer arriving...',
+    'ask.coach': 'Ask the coach',
+    'ask.placeholder': 'Ask anything about this drill',
+    'ask.send': 'Ask',
+    'ask.thinking': 'Coach thinking...',
+    'ask.intro': 'Did not understand the feedback or want to go deeper? Ask the coach anything about this drill.'
   },
   zh: {
     'header.roleplay':  ['角色扮演', '练到反射 才算会'],
@@ -333,7 +350,15 @@ const I18N = {
     'mic.unsupported': '当前浏览器不支持语音识别 请用 Chrome 或 Safari',
     'mic.denied': '麦克风权限被拒绝',
     'continue.chat': '继续这段对话',
-    'continue.note': '从你停下的地方继续 新的评分会生成一条新记录 不影响原来的'
+    'continue.note': '从你停下的地方继续 新的评分会生成一条新记录 不影响原来的',
+    'treatment.label': '治疗项目',
+    'treatment.note': '本次项目',
+    'opening.loading': '客户进店中...',
+    'ask.coach': '问教练',
+    'ask.placeholder': '问任何关于这次演练的问题',
+    'ask.send': '提问',
+    'ask.thinking': '教练思考中...',
+    'ask.intro': '不理解反馈 或想深入了解 任何关于这次演练的问题都可以问教练'
   }
 };
 
@@ -433,6 +458,137 @@ const JOKER_CARDS = [
 
 const ALL_4D = [...FRAME_CARDS, ...VALUE_CARDS, ...ROOT_CARDS, ...CLOSE_CARDS, ...ELITE_CARDS, ...JOKER_CARDS];
 
+// ============ Data: Treatment Library ============
+const TREATMENT_CATEGORIES = [
+  { id: 'facial', en: 'Facial', zh: '面部护理', icon: '✨' },
+  { id: 'injectable', en: 'Injectable', zh: '注射类', icon: '💉' },
+  { id: 'energy', en: 'Energy Device', zh: '仪器治疗', icon: '⚡' },
+  { id: 'slimming', en: 'Slimming', zh: '塑形', icon: '💪' },
+  { id: 'spa', en: 'Spa / Detox', zh: 'SPA 排毒', icon: '🌿' },
+  { id: 'wellness', en: 'Wellness IV', zh: '抗衰养生', icon: '💊' }
+];
+
+const TREATMENTS = [
+  // Facial
+  { id: 'hydrafacial', cat: 'facial', name_en: 'Hydrafacial', name_zh: '水疗面护',
+    blurb_en: 'Multi-step facial: cleanse, exfoliate, infuse serum, hydrate. 30-60 min.',
+    blurb_zh: '多步骤面护 清洁 去角质 注入精华 补水 30-60 分钟',
+    concerns_en: 'Will it help acne, safe for sensitive skin, how often.',
+    concerns_zh: '能改善痘痘吗 敏感肌能做吗 多久做一次',
+    compliance_en: 'No permanent fix claims. Active acne -> doctor first.',
+    compliance_zh: '不能说永久 痘痘活动期先看医生',
+    typical_price: 'RM250-500 per session' },
+  { id: 'basic_facial', cat: 'facial', name_en: 'Basic Facial', name_zh: '基础面护',
+    blurb_en: 'Cleansing facial with mask, maintenance for normal skin.',
+    blurb_zh: '清洁面护加面膜 维护性护理',
+    concerns_en: 'Is this enough, when do I need machine treatments.',
+    concerns_zh: '这个够吗 什么时候需要做仪器',
+    compliance_en: 'Maintenance only. Active concerns need machine treatments.',
+    compliance_zh: '仅维护用 活动期问题需仪器治疗',
+    typical_price: 'RM150-300 per session' },
+  // Injectable
+  { id: 'skinbooster', cat: 'injectable', name_en: 'Skinbooster (HA)', name_zh: '皮肤水光针',
+    blurb_en: 'Microinjection of hyaluronic acid for hydration and skin quality. Doctor-performed.',
+    blurb_zh: '微注射玻尿酸 改善肤质和水分 必须医生操作',
+    concerns_en: 'Painful, will it leave bumps, how long does it last.',
+    concerns_zh: '痛吗 会不会有针眼 维持多久',
+    compliance_en: 'Doctor required. Cannot promise specific result. Lasts 6-12 months.',
+    compliance_zh: '必须医生操作 不能承诺具体效果 维持 6-12 个月',
+    typical_price: 'RM2000-4500 per session' },
+  { id: 'botox', cat: 'injectable', name_en: 'Botox / Dysport', name_zh: '肉毒素',
+    blurb_en: 'Muscle relaxant for wrinkles, jaw/calf slimming. Doctor-performed.',
+    blurb_zh: '肌肉松弛 改善动态纹 瘦脸瘦腿 必须医生操作',
+    concerns_en: 'Will I look frozen, can I move my face, how long, dangerous.',
+    concerns_zh: '会僵掉吗 表情会怪吗 维持多久 危险吗',
+    compliance_en: 'Doctor required. NEVER guarantee no frozen look. Lasts 3-6 months. Authentic brand only.',
+    compliance_zh: '必须医生操作 不能保证不会僵 维持 3-6 个月 必须正品',
+    typical_price: 'RM800-2500 per area' },
+  { id: 'filler', cat: 'injectable', name_en: 'HA Filler', name_zh: '玻尿酸填充',
+    blurb_en: 'HA filler for volume (cheek, lip, nose, chin). Doctor-performed.',
+    blurb_zh: '玻尿酸填充 增加体积 (面颊 唇 鼻 下巴) 必须医生操作',
+    concerns_en: 'Will I look fake, is it safe, will it migrate.',
+    concerns_zh: '会很假吗 安全吗 会不会移位',
+    compliance_en: 'Doctor required. Reversible (dissolved). Never promise specific shape.',
+    compliance_zh: '必须医生操作 可溶解可逆 不能承诺具体形状',
+    typical_price: 'RM2500-4500 per syringe' },
+  // Energy Device
+  { id: 'pico_laser', cat: 'energy', name_en: 'Pico Laser', name_zh: '皮秒激光',
+    blurb_en: 'Picosecond laser for pigmentation, freckles, dull skin.',
+    blurb_zh: '皮秒激光 治疗色斑 雀斑 暗沉',
+    concerns_en: 'How many sessions, downtime, will pigmentation come back.',
+    concerns_zh: '要做几次 恢复期多久 色斑会回来吗',
+    compliance_en: 'Multiple sessions needed. Possible downtime. No permanent removal claim. Sun protection critical.',
+    compliance_zh: '需要多次 可能有恢复期 不能说永久祛除 必须强调防晒',
+    typical_price: 'RM800-1800 per session' },
+  { id: 'ultra360', cat: 'energy', name_en: 'Ultra 360 / HIFU', name_zh: '超声刀',
+    blurb_en: 'Focused ultrasound for skin tightening at SMAS layer.',
+    blurb_zh: '聚焦超声波 SMAS 层提拉紧致',
+    concerns_en: 'Painful, when does result show, how long, how many shots.',
+    concerns_zh: '痛吗 多久见效 维持多久 多少发',
+    compliance_en: 'Discuss pain management. Result onset 8-12 weeks. Lasts 12-18 months.',
+    compliance_zh: '说明镇痛 8-12 周见效 维持 12-18 个月',
+    typical_price: 'RM3500-8000 per session' },
+  // Slimming
+  { id: 'fat_freezing', cat: 'slimming', name_en: 'Fat Freezing', name_zh: '冷冻溶脂',
+    blurb_en: 'Cryolipolysis for stubborn fat pockets. 60 min per area.',
+    blurb_zh: '冷冻溶脂 针对顽固脂肪堆积 每个部位 60 分钟',
+    concerns_en: 'Does it hurt, will fat come back, how much loss.',
+    concerns_zh: '会痛吗 脂肪会回来吗 能减多少',
+    compliance_en: 'Contouring not weight loss. Cannot promise specific cm. Diet/exercise still needed.',
+    compliance_zh: '是塑形不是减肥 不能承诺具体 cm 数 仍需饮食运动',
+    typical_price: 'RM1200-2500 per area per session' },
+  { id: 'magneto', cat: 'slimming', name_en: 'Magneto Sculpt', name_zh: '磁波塑形',
+    blurb_en: 'High intensity magnetic muscle contraction. Builds muscle, reduces fat.',
+    blurb_zh: '高强度磁波肌肉收缩 增肌减脂',
+    concerns_en: 'Will I see definition, do I still need to gym, suitable for me.',
+    concerns_zh: '能看到线条吗 还要去健身房吗 我适合吗',
+    compliance_en: 'Supplement not replacement for training. Body screening needed.',
+    compliance_zh: '是辅助不是替代训练 需要体质评估',
+    typical_price: 'RM800-1500 per session' },
+  // Spa / Detox
+  { id: 'lymphatic', cat: 'spa', name_en: 'Lymphatic Drainage', name_zh: '淋巴排毒',
+    blurb_en: 'Manual or device-assisted lymph circulation. Reduces puffiness.',
+    blurb_zh: '手法或仪器淋巴循环 减少水肿',
+    concerns_en: 'Does it actually detox, vs regular massage.',
+    concerns_zh: '真的能排毒吗 跟普通按摩有什么区别',
+    compliance_en: 'Reduces water retention. Cannot claim medical toxin removal. Use circulation language.',
+    compliance_zh: '改善水肿 不能说医学排毒 用循环改善的说法',
+    typical_price: 'RM200-500 per session' },
+  { id: 'detox', cat: 'spa', name_en: 'Detox Treatment', name_zh: '排毒护理',
+    blurb_en: 'Body wrap, sweating, lymphatic massage combined.',
+    blurb_zh: '身体裹敷 出汗 淋巴按摩 综合护理',
+    concerns_en: 'Will I lose weight, is sweating safe, blood pressure issues.',
+    concerns_zh: '能减肥吗 出汗安全吗 血压问题怎么办',
+    compliance_en: 'Wellness not weight loss. Pre-screen cardiovascular. Hydration required.',
+    compliance_zh: '是调理不是减肥 心血管问题需筛查 强调补水',
+    typical_price: 'RM350-700 per session' },
+  // Wellness IV
+  { id: 'iv_drip', cat: 'wellness', name_en: 'Vitamin IV Drip', name_zh: '静脉营养',
+    blurb_en: 'IV infusion of vitamins, minerals, antioxidants. Doctor-supervised.',
+    blurb_zh: '静脉输注维生素 矿物质 抗氧化 必须医生监督',
+    concerns_en: 'Is it safe, what does it do, is it expensive water.',
+    concerns_zh: '安全吗 真的有用吗 是不是贵的水',
+    compliance_en: 'Doctor required. Cannot promise specific health benefits. Pre-screening blood work.',
+    compliance_zh: '必须医生操作 不能承诺具体健康好处 建议先验血',
+    typical_price: 'RM500-1500 per session' },
+  { id: 'stem_cell', cat: 'wellness', name_en: 'Live Stem Cell', name_zh: '活细胞',
+    blurb_en: 'Premium wellness for cellular regeneration. Doctor required, strict compliance.',
+    blurb_zh: '高端抗衰治疗 细胞修复 必须医生操作 严格合规',
+    concerns_en: 'Is it legal, is it safe, what results, worth the price.',
+    concerns_zh: '合法吗 安全吗 效果是什么 值这个价吗',
+    compliance_en: 'Doctor required. NEVER promise anti-aging or longevity. Disclose source. Pre-screening mandatory.',
+    compliance_zh: '必须医生操作 不能承诺抗衰长寿 说明来源 必须先筛查',
+    typical_price: 'RM10000-30000 per course' },
+  { id: 'peptide', cat: 'wellness', name_en: 'Peptide Injection', name_zh: '肽类注射',
+    blurb_en: 'Injectable peptides for cellular signaling, recovery, performance. Doctor-supervised.',
+    blurb_zh: '肽类注射 细胞信号 恢复 表现 医生监督',
+    concerns_en: 'What does it do, long-term safety, is it hormones.',
+    concerns_zh: '具体有什么作用 长期安全吗 是激素吗',
+    compliance_en: 'Doctor required. Specify peptide type and source. No medical treatment claims.',
+    compliance_zh: '必须医生操作 说明肽类型和来源 不能说医学治疗',
+    typical_price: 'RM800-2500 per session' }
+];
+
 const SIX_R = [
   { id: 'reassure', en_name: 'Reassure', zh_name: '安心感', phase_en: 'Pre-consult', phase_zh: '咨询前', feel_en: 'Warm and welcoming', feel_zh: '温暖 安心', mean_en: 'Lower their guard and build trust before consultation begins.', mean_zh: '在正式咨询前先放下客户的戒心 建立信任', why_en: 'Without trust, conversion is low.', why_zh: '没有信任 就没有转化' },
   { id: 'recommend', en_name: 'Recommend', zh_name: '专业感', phase_en: 'Consultation', phase_zh: '咨询', feel_en: 'Expertise', feel_zh: '专业 清晰', mean_en: 'Doctor and Consultant give clear diagnosis and plan, no overclaim.', mean_zh: '医生与顾问提供清晰诊断与方案 不夸大', why_en: 'Shows true professionalism.', why_zh: '展现真正的专业与可信度' },
@@ -482,7 +638,7 @@ const STATE = {
   lang: 'en', tab: 'roleplay', scenario: null, conversation: [], voiceTranscript: '',
   recording: false, recognition: null, knowledgeView: '4d', knowledgeCat: 'frame',
   knowledgeSearch: '', busy: false, lastRaw: '', pendingReplyText: '', scenarioLevel: 1,
-  viewingSession: null, currentGrade: null
+  viewingSession: null, currentGrade: null, treatmentCat: 'facial', treatment: null
 };
 
 // ============ Storage ============
@@ -508,6 +664,10 @@ function buildSystemPrompt() {
   const summarize4D = (cards, label) => `${label}:\n` + cards.map(c => `- ${c.name_en} (${c.name_zh}): when ${c.when_en}. Script: ${c.body_en}`).join('\n');
   const summarizePersonas = () => 'L1 Personas: ' + L1_PERSONAS.map(p => `${p.n}.${p.name_en} (obj: ${p.obj_en})`).join('; ') + '\nL2 Root: ' + L2_ROOT.map(p => `${p.n}.${p.t_en} (cue: ${p.cue_en})`).join('; ') + '\nL3 Emotional: ' + L3_EMO.map(p => `${p.n}.${p.t_en} -> ${p.frame_en}`).join('; ');
   const summarize6R = () => SIX_R.map(s => `${s.en_name} (${s.zh_name}, ${s.phase_en}): ${s.mean_en}`).join('\n');
+  const summarizeTreatments = () => TREATMENT_CATEGORIES.map(cat => {
+    const inCat = TREATMENTS.filter(t => t.cat === cat.id);
+    return `\n${cat.en} (${cat.zh}):\n` + inCat.map(t => `  - ${t.name_en} / ${t.name_zh}: ${t.blurb_en} | Common concerns: ${t.concerns_en} | Compliance: ${t.compliance_en} | Price: ${t.typical_price}`).join('\n');
+  }).join('\n');
 
   return `You are the AI brain of the Emax Sales Drill app. Emax is an aesthetic medical clinic. You roleplay as customers and grade sales performance using the Emax 4D Closing System.
 
@@ -531,6 +691,12 @@ ${summarizePersonas()}
 
 === 6R CUSTOMER JOURNEY ===
 ${summarize6R()}
+
+=== TREATMENT LIBRARY ===
+Emax offers treatments across 6 categories. Each has its own customer concerns and compliance language. When you roleplay as a customer or coach a salesperson, ground your speech in the SPECIFIC treatment context. Mention realistic concerns and compliance issues for that treatment.
+${summarizeTreatments()}
+
+CRITICAL: Different treatments need different compliance language. Botox cannot be promised "no frozen look". Stem cell cannot be promised "anti-aging". IV drip cannot promise specific health benefits. Match your dialogue to the treatment in question.
 
 === EXECUTIVE SUMMARY: SALES TEAM PROBLEM AND GAP (May 2026, latest from Notion) ===
 
@@ -791,6 +957,13 @@ async function translateActiveContent(targetLang) {
     if (s.breakdown) {
       pushFeedback(s.breakdown.feedback);
     }
+    if (s.coachChat && Array.isArray(s.coachChat)) {
+      s.coachChat.forEach(m => { if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); } });
+    }
+  }
+  // Also translate live grade coachChat
+  if ((STATE.tab === 'roleplay' || STATE.tab === 'voice') && STATE.currentGrade && STATE.currentGrade.coachChat) {
+    STATE.currentGrade.coachChat.forEach(m => { if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); } });
   }
   if (items.length === 0) return;
   const overlay = document.createElement('div');
@@ -912,11 +1085,22 @@ function renderRoleplay() {
   const c = document.getElementById('content');
   if (!STATE.scenario) {
     const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
+    const trBar = `<div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">${t('treatment.label')}</div><div class="cat-row" style="margin-bottom:8px;">${TREATMENT_CATEGORIES.map(tc => `<button class="cat-chip ${STATE.treatmentCat === tc.id ? 'active' : ''}" data-tcat="${tc.id}">${tc.icon} ${tx(tc.en, tc.zh)}</button>`).join('')}</div>`;
     const lvlBar = `<div class="cat-row" style="margin-bottom:10px;"><button class="cat-chip ${STATE.scenarioLevel === 1 ? 'active' : ''}" data-level="1">${t('lvl.l1')}</button><button class="cat-chip ${STATE.scenarioLevel === 2 ? 'active' : ''}" data-level="2">${t('lvl.l2')}</button><button class="cat-chip ${STATE.scenarioLevel === 3 ? 'active' : ''}" data-level="3">${t('lvl.l3')}</button></div>`;
     const filtered = SCENARIOS.filter(s => s.level === STATE.scenarioLevel);
-    c.innerHTML = `${noKey}<div class="notice">${t('roleplay.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
+    c.innerHTML = `${noKey}<div class="notice">${t('roleplay.intro')}</div>${trBar}${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
     c.querySelectorAll('[data-level]').forEach(b => { b.onclick = () => { STATE.scenarioLevel = parseInt(b.getAttribute('data-level'), 10); renderRoleplay(); }; });
-    c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.conversation = [{ role: 'customer', text: tx(STATE.scenario.open_en, STATE.scenario.open_zh) }]; renderRoleplay(); }; });
+    c.querySelectorAll('[data-tcat]').forEach(b => { b.onclick = () => { STATE.treatmentCat = b.getAttribute('data-tcat'); renderRoleplay(); }; });
+    c.querySelectorAll('.scenario-card').forEach(b => {
+      b.onclick = () => {
+        const id = b.getAttribute('data-scen');
+        STATE.scenario = SCENARIOS.find(s => s.id === id);
+        const candidates = TREATMENTS.filter(tr => tr.cat === STATE.treatmentCat);
+        STATE.treatment = candidates[Math.floor(Math.random() * candidates.length)] || TREATMENTS[0];
+        STATE.conversation = [];
+        openCustomerScenario();
+      };
+    });
     return;
   }
   const s = STATE.scenario;
@@ -933,7 +1117,9 @@ function renderRoleplay() {
     }
     return bubble + hintHtml;
   };
-  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div><textarea class="textarea" id="reply" placeholder="${t('reply.placeholder')}"></textarea><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn btn-secondary" id="mic-btn" style="flex:1; padding:12px 8px;">${STATE.recording ? `<span class="recording-pulse"></span>${t('mic.stop')}` : t('mic.start')}</button><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button><button class="btn btn-secondary" id="grade" style="flex:1.3;" ${STATE.busy ? 'disabled' : ''}>${t('btn.end_score')}</button></div><div id="grade-out"></div>`;
+  const treatmentTag = STATE.treatment ? `<div style="margin-top:6px;"><span class="card-tag">${STATE.treatment.cat === 'facial' ? '✨' : STATE.treatment.cat === 'injectable' ? '💉' : STATE.treatment.cat === 'energy' ? '⚡' : STATE.treatment.cat === 'slimming' ? '💪' : STATE.treatment.cat === 'spa' ? '🌿' : '💊'} ${tx(STATE.treatment.name_en, STATE.treatment.name_zh)}</span></div>` : '';
+  const loadingOpen = STATE.busy && STATE.conversation.length === 0 ? `<div class="loading">${t('opening.loading')}</div>` : '';
+  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div>${treatmentTag}</div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div>${loadingOpen}<textarea class="textarea" id="reply" placeholder="${t('reply.placeholder')}"></textarea><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn btn-secondary" id="mic-btn" style="flex:1; padding:12px 8px;">${STATE.recording ? `<span class="recording-pulse"></span>${t('mic.stop')}` : t('mic.start')}</button><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button><button class="btn btn-secondary" id="grade" style="flex:1.3;" ${STATE.busy ? 'disabled' : ''}>${t('btn.end_score')}</button></div><div id="grade-out"></div>`;
   document.getElementById('back').onclick = () => { stopRecognition(); STATE.scenario = null; STATE.conversation = []; renderRoleplay(); };
   document.getElementById('send').onclick = () => { stopRecognition(); onSendReply(); };
   document.getElementById('grade').onclick = () => { stopRecognition(); onGradeRoleplay(); };
@@ -990,6 +1176,34 @@ Total under 130 words. Show options. Do NOT prescribe one answer. Teach judgment
   renderRoleplay();
 }
 
+async function openCustomerScenario() {
+  const s = STATE.scenario;
+  if (!s || !STATE.treatment) return;
+  STATE.busy = true;
+  renderRoleplay();
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const tr = STATE.treatment;
+  const prompt = `[ROLEPLAY START] You are a customer arriving at the clinic. Generate the customer's OPENING line.
+
+Persona: ${s.title_en}. Profile: ${s.profile_en}. Concern: ${s.concern_en}.
+Treatment they came in to ask about: ${tr.name_en} / ${tr.name_zh}. About this treatment: ${tr.blurb_en}. Typical concerns customers have: ${tr.concerns_en}. Price range: ${tr.typical_price}.
+
+Generate ONE opening line (1-3 sentences) in ${langName}. The customer should naturally mention or imply ${tr.name_en} as what they came in for. The opening should reflect this persona's typical style (e.g. price-sensitive complains about cost, skeptical doubts effectiveness, husband-controlled defers decision).
+
+Output ONLY the customer's words. No prefix, no JSON, no quotes around the line. Stay in customer character.`;
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: prompt }], 200); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); STATE.busy = false; renderRoleplay(); return; }
+    raw = '';
+  }
+  raw = (raw || '').trim().replace(/^[Cc]ustomer[:：]\s*/, '').replace(/^["'“「]+|["'”」]+$/g, '');
+  if (!raw) { raw = tx(s.open_en, s.open_zh); }
+  STATE.conversation = [{ role: 'customer', text: raw }];
+  STATE.busy = false;
+  renderRoleplay();
+}
+
 async function onSendReply() {
   if (STATE.busy) return;
   const ta = document.getElementById('reply');
@@ -1001,7 +1215,8 @@ async function onSendReply() {
   const c = document.getElementById('content');
   c.insertAdjacentHTML('beforeend', `<div class="loading" id="lo">${t('customer.thinking')}</div>`);
   const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
-  const scenarioBrief = `[ROLEPLAY] You are the customer in this scenario. Title: ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}. Reply in ${langName}. Stay in character. 1-3 sentences.`;
+  const trBrief = STATE.treatment ? ` Treatment in question: ${STATE.treatment.name_en} (${STATE.treatment.blurb_en}). Typical customer concerns: ${STATE.treatment.concerns_en}.` : '';
+  const scenarioBrief = `[ROLEPLAY] You are the customer in this scenario. Title: ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}.${trBrief} Reply in ${langName}. Stay in character. 1-3 sentences.`;
   const messages = [{ role: 'user', content: scenarioBrief }];
   STATE.conversation.forEach((m, i) => {
     if (i === 0 && m.role === 'customer') {
@@ -1042,10 +1257,12 @@ async function onGradeRoleplay() {
     type: 'chat',
     scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh),
     scenarioId: STATE.scenario.id,
+    treatment: STATE.treatment ? { id: STATE.treatment.id, name_en: STATE.treatment.name_en, name_zh: STATE.treatment.name_zh, compliance_en: STATE.treatment.compliance_en } : null,
     score: total,
     breakdown: result.parsed,
     transcript,
-    conversation: STATE.conversation.map(m => ({ role: m.role, text: m.text, hintText: m.hintText || '' }))
+    conversation: STATE.conversation.map(m => ({ role: m.role, text: m.text, hintText: m.hintText || '' })),
+    coachChat: []
   };
   saveSession(sessionData);
   STATE.currentGrade = sessionData;
@@ -1134,10 +1351,71 @@ function renderScoreCard(container, r, total) {
     return `<div class="feedback-item cat-${escapeHtml(d)}">${badge}${escapeHtml(f.text || f.comment || '')}${expansionBlock}<div>${btn}</div></div>`;
   }).join('') : `<div class="feedback-item">${t('fb.placeholder1')}</div>`;
   const max = maxScore(r);
-  container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/${max}</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('frame', t('rubric.frame'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('compliance', t('rubric.compliance'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div></div>`;
+  // Coach Q&A section
+  const grade = STATE.viewingSession || STATE.currentGrade;
+  const coachChat = (grade && grade.coachChat) || [];
+  const coachHtml = coachChat.length ? coachChat.map(m => `<div class="coach-msg ${m.role}"><div class="coach-bubble">${escapeHtml(m.text)}</div></div>`).join('') : `<div class="ask-coach-intro">${t('ask.intro')}</div>`;
+  const coachLoading = (grade && grade.coachLoading) ? `<div class="loading">${t('ask.thinking')}</div>` : '';
+  const coachSection = `<div class="ask-coach-card"><div class="ask-coach-title">🎓 ${t('ask.coach')}</div>${coachHtml}${coachLoading}<div class="coach-input-row"><textarea class="textarea" id="ask-input" placeholder="${t('ask.placeholder')}" style="min-height:50px;"></textarea></div><div style="margin-top:6px;"><button class="btn" id="ask-send" ${(grade && grade.coachLoading) ? 'disabled' : ''}>${t('ask.send')}</button></div></div>`;
+  container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/${max}</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('frame', t('rubric.frame'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('compliance', t('rubric.compliance'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div>${coachSection}</div>`;
   container.querySelectorAll('.say-more-btn').forEach(b => {
     b.onclick = () => onSayMore(parseInt(b.getAttribute('data-fb-idx'), 10));
   });
+  const askSend = container.querySelector('#ask-send');
+  if (askSend) askSend.onclick = () => onAskCoach();
+}
+
+async function onAskCoach() {
+  const input = document.getElementById('ask-input');
+  if (!input) return;
+  const question = (input.value || '').trim();
+  if (!question) return;
+  const grade = STATE.viewingSession || STATE.currentGrade;
+  if (!grade) return;
+  if (!grade.coachChat) grade.coachChat = [];
+  grade.coachChat.push({ role: 'user', text: question });
+  grade.coachLoading = true;
+  rerenderActiveGrade();
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const transcriptText = grade.transcript || (grade.conversation || []).map(m => (m.role === 'customer' ? 'CUSTOMER: ' : 'SALES: ') + m.text).join('\n');
+  const breakdown = grade.breakdown || {};
+  const fbSummary = (breakdown.feedback || []).map(f => typeof f === 'object' ? `[${f.dim}] ${f.text}` : f).join('\n');
+  const trCtx = grade.scenarioId ? (function() { const sc = SCENARIOS.find(s => s.id === grade.scenarioId); return sc ? `Scenario: ${sc.title_en}. Profile: ${sc.profile_en}.` : ''; })() : '';
+  const history = (grade.coachChat || []).slice(0, -1).map(m => (m.role === 'user' ? 'TRAINEE: ' : 'COACH: ') + m.text).join('\n');
+  const prompt = `[POSTMORTEM] The trainee just completed a drill and is asking a follow-up question to deepen learning. You are the senior coach. Use the full 4D system, May gaps, and the actual transcript to answer.
+
+${trCtx}
+Treatment context: ${grade.treatment ? grade.treatment.name_en + ' - ' + grade.treatment.compliance_en : 'unknown'}.
+
+DRILL TRANSCRIPT:
+${transcriptText}
+
+GRADING THEY GOT:
+profile=${breakdown.profile} frame=${breakdown.frame} root=${breakdown.root} reframe=${breakdown.reframe} close=${breakdown.close_dim} compliance=${breakdown.compliance}
+Feedback:
+${fbSummary}
+
+${history ? 'PREVIOUS Q&A IN THIS POSTMORTEM:\n' + history + '\n' : ''}
+TRAINEE NOW ASKS: "${question}"
+
+Answer in ${langName}. Conversational, under 200 words. Reference specific moments from the transcript. Cite specific 4D cards. Connect to broader principles. If they ask "what if I said X", show how the AI customer might react and why. Teach judgment, not rules.
+
+Output plain text. No JSON. No code fences.`;
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: prompt }], 800); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); grade.coachLoading = false; rerenderActiveGrade(); return; }
+    raw = '';
+  }
+  raw = (raw || '').trim();
+  grade.coachChat.push({ role: 'ai', text: raw || (STATE.lang === 'zh' ? '抱歉 教练暂时无法回答 请重试' : 'Coach unavailable, try again') });
+  grade.coachLoading = false;
+  // Persist to localStorage
+  if (grade.ts) {
+    updateSession(grade.ts, { coachChat: grade.coachChat });
+  }
+  rerenderActiveGrade();
+  setTimeout(() => { const inp = document.getElementById('ask-input'); if (inp) inp.value = ''; }, 50);
 }
 
 async function onSayMore(idx) {
@@ -1215,14 +1493,18 @@ function renderVoice() {
   const c = document.getElementById('content');
   if (!STATE.scenario) {
     const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
+    const trBar = `<div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">${t('treatment.label')}</div><div class="cat-row" style="margin-bottom:8px;">${TREATMENT_CATEGORIES.map(tc => `<button class="cat-chip ${STATE.treatmentCat === tc.id ? 'active' : ''}" data-tcat="${tc.id}">${tc.icon} ${tx(tc.en, tc.zh)}</button>`).join('')}</div>`;
     const lvlBar = `<div class="cat-row" style="margin-bottom:10px;"><button class="cat-chip ${STATE.scenarioLevel === 1 ? 'active' : ''}" data-level="1">${t('lvl.l1')}</button><button class="cat-chip ${STATE.scenarioLevel === 2 ? 'active' : ''}" data-level="2">${t('lvl.l2')}</button><button class="cat-chip ${STATE.scenarioLevel === 3 ? 'active' : ''}" data-level="3">${t('lvl.l3')}</button></div>`;
     const filtered = SCENARIOS.filter(s => s.level === STATE.scenarioLevel);
-    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
+    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div>${trBar}${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
     c.querySelectorAll('[data-level]').forEach(b => { b.onclick = () => { STATE.scenarioLevel = parseInt(b.getAttribute('data-level'), 10); renderVoice(); }; });
+    c.querySelectorAll('[data-tcat]').forEach(b => { b.onclick = () => { STATE.treatmentCat = b.getAttribute('data-tcat'); renderVoice(); }; });
     c.querySelectorAll('.scenario-card').forEach(b => {
       b.onclick = () => {
         const id = b.getAttribute('data-scen');
         STATE.scenario = SCENARIOS.find(s => s.id === id);
+        const candidates = TREATMENTS.filter(tr => tr.cat === STATE.treatmentCat);
+        STATE.treatment = candidates[Math.floor(Math.random() * candidates.length)] || TREATMENTS[0];
         const greeting = STATE.lang === 'zh' ? t('demo.greetingZh') : t('demo.greetingEn');
         STATE.conversation = [{ role: 'consultant', text: greeting, card: 'Welcome / Reassure' }];
         renderVoice();
@@ -1239,7 +1521,8 @@ function renderVoice() {
     }
     return `<div class="bubble staff"><div class="bubble-label">${t('demo.youTag')}</div>${escapeHtml(m.text)}</div>`;
   };
-  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${t('demo.youplay')}</div><div class="card-body">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body" style="margin-top:6px;"><span style="color:var(--text-secondary);">${t('concern')}:</span> ${tx(s.concern_en, s.concern_zh)}</div></div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div><textarea class="textarea" id="reply" placeholder="${t('demo.startReply')}"></textarea><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn btn-secondary" id="mic-btn" style="flex:1; padding:12px 8px;">${STATE.recording ? `<span class="recording-pulse"></span>${t('mic.stop')}` : t('mic.start')}</button><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button></div>`;
+  const treatmentTag = STATE.treatment ? `<div style="margin-top:6px;"><span class="card-tag">${STATE.treatment.cat === 'facial' ? '✨' : STATE.treatment.cat === 'injectable' ? '💉' : STATE.treatment.cat === 'energy' ? '⚡' : STATE.treatment.cat === 'slimming' ? '💪' : STATE.treatment.cat === 'spa' ? '🌿' : '💊'} ${tx(STATE.treatment.name_en, STATE.treatment.name_zh)}</span></div>` : '';
+  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${t('demo.youplay')}</div><div class="card-body">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body" style="margin-top:6px;"><span style="color:var(--text-secondary);">${t('concern')}:</span> ${tx(s.concern_en, s.concern_zh)}</div>${treatmentTag}</div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div><textarea class="textarea" id="reply" placeholder="${t('demo.startReply')}"></textarea><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn btn-secondary" id="mic-btn" style="flex:1; padding:12px 8px;">${STATE.recording ? `<span class="recording-pulse"></span>${t('mic.stop')}` : t('mic.start')}</button><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button></div>`;
   document.getElementById('back').onclick = () => { stopRecognition(); STATE.scenario = null; STATE.conversation = []; renderVoice(); };
   document.getElementById('send').onclick = () => { stopRecognition(); onSendDemoReply(); };
   document.getElementById('mic-btn').onclick = toggleRecordForReply;
@@ -1257,7 +1540,8 @@ async function onSendDemoReply() {
   const c = document.getElementById('content');
   c.insertAdjacentHTML('beforeend', `<div class="loading" id="lo">${STATE.lang === 'zh' ? '顾问思考中...' : 'Consultant thinking...'}</div>`);
   const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
-  const sys = `[CONSULTANT_DEMO] You are the senior Emax consultant. The trainee is roleplaying as customer persona: ${STATE.scenario.src} - ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}. Reply in ${langName}. Use the 4D system. End your reply with a card tag on a new line: <<Card: card name>>.`;
+  const trCtx = STATE.treatment ? ` Treatment under discussion: ${STATE.treatment.name_en} (${STATE.treatment.blurb_en}). Compliance must-knows: ${STATE.treatment.compliance_en}.` : '';
+  const sys = `[CONSULTANT_DEMO] You are the senior Emax consultant. The trainee is roleplaying as customer persona: ${STATE.scenario.src} - ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}.${trCtx} Reply in ${langName}. Use the 4D system. Apply treatment-specific compliance language. End your reply with a card tag on a new line: <<Card: card name>>.`;
   const messages = [{ role: 'user', content: sys }];
   STATE.conversation.forEach((m, i) => {
     if (i === 0 && m.role === 'consultant') {

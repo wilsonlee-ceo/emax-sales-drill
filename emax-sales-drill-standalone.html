@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2c2c2c">
+<title>Emax Sales Drill</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f8f8f7;
+  --surface: #ffffff;
+  --border: #e9e9e7;
+  --text: #1f1f1f;
+  --text-secondary: #6e6e6e;
+  --primary: #2c2c2c;
+  --primary-text: #ffffff;
+  --accent: #b8854d;
+  --accent-bg: #faf3e8;
+  --success: #2d7a4d;
+  --warning: #c95f1e;
+  --danger: #c0392b;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg); padding-bottom: 84px; position: relative; }
+.header { background: var(--surface); padding: 12px 16px 10px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.header-title h1 { font-size: 17px; font-weight: 600; line-height: 1.2; }
+.header-title p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.2; }
+.lang-switch { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 2px; font-size: 12px; flex-shrink: 0; }
+.lang-switch button { border: none; background: none; padding: 4px 10px; border-radius: 14px; cursor: pointer; font-family: inherit; font-size: 12px; color: var(--text-secondary); }
+.lang-switch button.active { background: var(--primary); color: var(--primary-text); }
+.content { padding: 14px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+.card-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; line-height: 1.3; }
+.card-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.card-body { font-size: 13px; color: var(--text); }
+.tag { display: inline-block; padding: 2px 8px; background: var(--accent-bg); color: var(--accent); border-radius: 4px; font-size: 11px; margin-right: 6px; font-weight: 500; }
+.tag.dim { background: var(--bg); color: var(--text-secondary); }
+.btn { display: inline-block; padding: 12px 18px; background: var(--primary); color: var(--primary-text); border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 500; cursor: pointer; text-align: center; width: 100%; font-family: inherit; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: var(--danger); color: white; }
+.input, .textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; background: var(--surface); color: var(--text); resize: vertical; }
+.textarea { min-height: 70px; }
+.tabbar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--surface); border-top: 1px solid var(--border); max-width: 480px; margin: 0 auto; z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0); }
+.tab { flex: 1; padding: 10px 4px 12px; text-align: center; cursor: pointer; border: none; background: none; font-family: inherit; color: var(--text-secondary); }
+.tab.active { color: var(--primary); }
+.tab-icon { display: block; font-size: 20px; margin-bottom: 2px; line-height: 1; }
+.tab-label { font-size: 11px; }
+.scenario-grid { display: flex; flex-direction: column; gap: 8px; }
+.scenario-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; text-align: left; width: 100%; font-family: inherit; font-size: inherit; color: var(--text); }
+.scenario-card:active { background: var(--accent-bg); }
+.level-pill { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-right: 6px; font-weight: 500; }
+.level-1 { background: #e3f3e7; color: #2d7a4d; }
+.level-2 { background: #fff4e0; color: #c95f1e; }
+.level-3 { background: #fde8e6; color: #c0392b; }
+.chat { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
+.bubble.customer { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.bubble.staff { align-self: flex-end; background: var(--primary); color: var(--primary-text); border-bottom-right-radius: 4px; }
+.bubble-label { font-size: 10px; color: var(--text-secondary); margin-bottom: 2px; }
+.bubble.staff .bubble-label { color: rgba(255,255,255,0.7); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 8px; }
+.score-row:last-of-type { border-bottom: none; }
+.score-row > span:first-child { flex-shrink: 0; }
+.score-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; max-width: 100px; }
+.score-bar-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+.stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.stat-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 8px; text-align: center; }
+.stat-num { font-size: 22px; font-weight: 600; color: var(--primary); line-height: 1.2; }
+.stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.search-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); }
+.toggle-row { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin: 10px 0 10px; padding: 3px; gap: 3px; }
+.toggle-btn { flex: 1; padding: 8px; text-align: center; border: none; background: none; cursor: pointer; font-family: inherit; font-size: 13px; color: var(--text-secondary); border-radius: 6px; }
+.toggle-btn.active { background: var(--primary); color: var(--primary-text); }
+.cat-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; }
+.cat-row::-webkit-scrollbar { display: none; }
+.cat-chip { flex-shrink: 0; padding: 6px 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); font-size: 12px; cursor: pointer; font-family: inherit; color: var(--text); white-space: nowrap; }
+.cat-chip.active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+.empty { text-align: center; color: var(--text-secondary); padding: 40px 20px; font-size: 13px; }
+.loading { text-align: center; color: var(--text-secondary); padding: 16px; font-size: 13px; }
+.recording-pulse { display: inline-block; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; animation: pulse 1.2s ease-in-out infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.transcript { background: var(--accent-bg); border: 1px solid #f0e1c8; border-radius: var(--radius-sm); padding: 12px; font-size: 14px; min-height: 60px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
+.feedback-section { margin-top: 14px; }
+.feedback-title { font-weight: 600; margin-bottom: 8px; font-size: 13px; }
+.feedback-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 12px; margin-bottom: 8px; font-size: 13px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; line-height: 1.5; }
+.notice { background: var(--accent-bg); border: 1px solid #f0e1c8; color: #6b4423; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
+.error-box { background: #fde8e6; border: 1px solid #f5b9b3; color: #8a2920; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 12px; line-height: 1.5; }
+.error-box pre { margin-top: 6px; font-size: 11px; white-space: pre-wrap; background: rgba(0,0,0,0.05); padding: 6px; border-radius: 4px; max-height: 200px; overflow: auto; }
+hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.back-btn { background: none; border: none; color: var(--accent); font-size: 14px; padding: 0; margin-bottom: 12px; cursor: pointer; font-family: inherit; }
+.kv-row { margin-top: 8px; font-size: 13px; line-height: 1.5; }
+.section-title { font-size: 14px; font-weight: 600; margin: 14px 0 8px; }
+.persona-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; font-size: 12px; }
+.persona-row > div { background: var(--bg); padding: 6px 8px; border-radius: 6px; }
+.persona-row strong { display: block; color: var(--text-secondary); font-size: 10px; font-weight: 500; margin-bottom: 2px; }
+.hint-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: 1px dashed var(--border); padding: 4px 10px; border-radius: 12px; font-size: 11px; color: var(--text-secondary); cursor: pointer; font-family: inherit; align-self: flex-end; margin-top: -4px; margin-right: 0; }
+.hint-btn:active { background: var(--bg); }
+.hint-card { align-self: flex-end; max-width: 82%; background: #f0f7e8; border: 1px solid #d4e4c0; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; line-height: 1.55; color: #3a5024; margin-top: 2px; white-space: pre-wrap; }
+.hint-card-label { font-size: 10px; font-weight: 600; color: #5a7a3a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.hint-loading { align-self: flex-end; font-size: 11px; color: var(--text-secondary); padding: 6px 10px; }
+.modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 20px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 17px; margin-bottom: 8px; }
+.modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+.modal .input { font-family: ui-monospace, monospace; font-size: 12px; }
+.warn-box { background: #fff4e0; border: 1px solid #f0c890; color: #8a4520; padding: 10px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="header" class="header">
+    <div class="header-title">
+      <h1 id="page-title">Drill</h1>
+      <p id="page-sub">Practice until reflex</p>
+    </div>
+    <div class="lang-switch">
+      <button id="lang-en" class="active">EN</button>
+      <button id="lang-zh">中文</button>
+    </div>
+  </div>
+  <div id="content" class="content"></div>
+  <div class="tabbar">
+    <button class="tab active" data-tab="roleplay"><span class="tab-icon">💬</span><span class="tab-label" data-i18n="tab.roleplay">Roleplay</span></button>
+    <button class="tab" data-tab="voice"><span class="tab-icon">🎙</span><span class="tab-label" data-i18n="tab.voice">Voice</span></button>
+    <button class="tab" data-tab="knowledge"><span class="tab-icon">📚</span><span class="tab-label" data-i18n="tab.knowledge">Cards</span></button>
+    <button class="tab" data-tab="dashboard"><span class="tab-icon">📊</span><span class="tab-label" data-i18n="tab.dashboard">Coach</span></button>
+    <button class="tab" data-tab="settings"><span class="tab-icon">⚙️</span><span class="tab-label" data-i18n="tab.settings">Settings</span></button>
+  </div>
+</div>
+<div id="modal-host"></div>
+
+<script>
+// ============ i18n ============
+const I18N = {
+  en: {
+    'header.roleplay':  ['Roleplay', 'Practice until reflex'],
+    'header.voice':     ['Voice Drill', 'Speak it, do not just think it'],
+    'header.knowledge': ['Cards', '4D Closing System and 6R Journey'],
+    'header.dashboard': ['Coach', 'Numbers do not lie'],
+    'header.settings':  ['Settings', 'API key and preferences'],
+    'tab.roleplay': 'Roleplay', 'tab.voice': 'Voice', 'tab.knowledge': 'Cards', 'tab.dashboard': 'Coach', 'tab.settings': 'Settings',
+    'roleplay.intro': 'Pick a customer scenario. AI plays the customer in English. End the drill to get scored on the 4D rubric.',
+    'voice.intro': 'Pick a scenario. Speak how you would respond. AI transcribes and scores your delivery. Mic permission required. Best on Chrome or Safari.',
+    'change.scenario': '← Change scenario', 'concern': 'Concern',
+    'reply.placeholder': 'How do you respond',
+    'btn.send': 'Send', 'btn.end_score': 'End and grade',
+    'btn.start_record': 'Start recording', 'btn.stop_record': 'Stop recording',
+    'btn.submit_grade': 'Submit and grade',
+    'live.transcript': 'Live transcript', 'transcript.placeholder': 'Press the button below to start',
+    'customer.opens': 'Customer opens', 'customer.thinking': 'Customer thinking...',
+    'grading': 'Grading...', 'grade.fail': 'Grading failed. Try again.',
+    'grade.show_raw': 'Show AI response', 'try.again': 'Try again',
+    'no.records': 'No drill records yet. Go to Roleplay or Voice to start.',
+    'recent.drills': 'Recent drills', 'weakest.dim': 'Weakest dimension',
+    'coach.action': 'Coach focus next',
+    'stat.total': 'Total drills', 'stat.avg': 'Avg score', 'stat.last7': 'Last 7 days',
+    'clear.records': 'Clear records (this device only)',
+    'clear.confirm': 'Clear all drill records on this device?',
+    'data.note': 'Stored on this device only. Not synced to server.',
+    'just.now': 'just now', 'mins.ago': 'min ago', 'hours.ago': 'hr ago',
+    'voice.text': 'voice', 'chat.text': 'chat',
+    'kb.search': 'Search cards by keyword',
+    'kb.4d': '4D System', 'kb.6r': '6R Journey', 'kb.persona': 'Personas',
+    'cat.frame': 'Frame (6)', 'cat.value': 'Value (6)', 'cat.root': 'Root (6)', 'cat.close': 'Close (10)', 'cat.elite': 'Elite (10)', 'cat.joker': 'Joker (2)',
+    'cat.l1': 'L1 Persona (12)', 'cat.l2': 'L2 Root (6)', 'cat.l3': 'L3 Emotional (8)',
+    'when.use': 'When to use', 'script.example': 'Script', 'risk.note': 'Watch out',
+    'detection': 'Detection cues', 'reframe': 'Reframe', 'avoid': 'Avoid',
+    'phase': 'Phase', 'feeling': 'Feeling', 'meaning': 'What it means', 'why': 'Why it matters',
+    'rubric.profile': 'Profile', 'rubric.root': 'Root cause', 'rubric.reframe': 'Reframe', 'rubric.close': 'Close', 'rubric.authority': 'Authority',
+    'total.score': 'Total', 'recorded': 'Drill recorded', 'feedback.title': 'Specific improvements',
+    'no.match': 'No matching cards', 'fb.placeholder1': 'No specific feedback returned',
+    'apikey.title': 'Set up your Anthropic API key',
+    'apikey.body': 'This app uses Claude (Anthropic) for the AI customer roleplay and grading. Your API key is stored ONLY on this device, in browser localStorage. It never leaves your device or hits our servers. The key starts with sk-ant-... Get one at console.anthropic.com.',
+    'apikey.warn': 'Important: only enter the key on devices you trust. Anyone with access to this device could read it. Use a key with a spending limit set in Anthropic console.',
+    'apikey.placeholder': 'sk-ant-api03-...',
+    'apikey.save': 'Save key',
+    'apikey.skip': 'Skip for now (AI will not work)',
+    'apikey.invalid': 'Key looks wrong. It should start with sk-ant-',
+    'apikey.testing': 'Testing key...',
+    'apikey.test_fail': 'Key did not work. Check the key and try again.',
+    'apikey.test_ok': 'Key works. Saved.',
+    'settings.apikey': 'Anthropic API key',
+    'settings.key_status_set': 'Key set (ends in {tail})',
+    'settings.key_status_unset': 'No key set. AI will not work.',
+    'settings.update_key': 'Update key',
+    'settings.clear_key': 'Clear key',
+    'settings.clear_confirm': 'Clear the API key from this device?',
+    'settings.about': 'About',
+    'settings.about_body': 'Standalone Emax Sales Drill app. Bring your own Anthropic API key. Data stored locally on each device. AI grounded in your 4D Closing System and 6R Customer Journey.',
+    'settings.cost_note': 'Cost estimate: roughly USD 0.01 per drill using Claude Haiku 4.5.',
+    'no.key': 'AI is not configured. Go to Settings to add your Anthropic API key.',
+    'hint.show': 'Coach hint',
+    'hint.hide': 'Hide hint',
+    'hint.loading': 'Thinking...',
+    'hint.label': 'Coach',
+    'hint.fail': 'Hint failed. Try again.'
+  },
+  zh: {
+    'header.roleplay':  ['角色扮演', '练到反射 才算会'],
+    'header.voice':     ['语音练习', '用嘴讲出来 不只是想'],
+    'header.knowledge': ['卡片库', '4D 成交系统 和 6R 旅程'],
+    'header.dashboard': ['教练看板', '数据不会撒谎'],
+    'header.settings':  ['设置', 'API 密钥和偏好'],
+    'tab.roleplay': '演练', 'tab.voice': '录音', 'tab.knowledge': '卡片', 'tab.dashboard': '看板', 'tab.settings': '设置',
+    'roleplay.intro': '选一个场景。AI 用中文扮演客户和你对话。结束后按 4D 评分。',
+    'voice.intro': '选一个场景。用普通话讲出你的回应。AI 会转录并评分。需要麦克风权限。',
+    'change.scenario': '← 换场景', 'concern': '关注点',
+    'reply.placeholder': '你怎么回应',
+    'btn.send': '发送', 'btn.end_score': '结束评分',
+    'btn.start_record': '开始录音', 'btn.stop_record': '停止录音',
+    'btn.submit_grade': '提交并评分',
+    'live.transcript': '实时转录', 'transcript.placeholder': '按下方按钮开始',
+    'customer.opens': '客户开口', 'customer.thinking': '客户思考中...',
+    'grading': '评分中...', 'grade.fail': '评分失败 请重试',
+    'grade.show_raw': '查看 AI 回复', 'try.again': '重试',
+    'no.records': '还没有演练记录 去演练或录音页开始',
+    'recent.drills': '最近演练', 'weakest.dim': '最弱环节',
+    'coach.action': '教练应优先加练',
+    'stat.total': '总演练', 'stat.avg': '平均分', 'stat.last7': '近7天',
+    'clear.records': '清空记录 (仅本机)', 'clear.confirm': '确认清空本机所有演练记录',
+    'data.note': '数据存在本机浏览器 未上传服务器',
+    'just.now': '刚刚', 'mins.ago': '分钟前', 'hours.ago': '小时前',
+    'voice.text': '语音', 'chat.text': '对话',
+    'kb.search': '搜索卡片关键词',
+    'kb.4d': '4D 系统', 'kb.6r': '6R 旅程', 'kb.persona': '客户画像',
+    'cat.frame': '框架 (6)', 'cat.value': '价值 (6)', 'cat.root': '根源 (6)', 'cat.close': '成交 (10)', 'cat.elite': '精英 (10)', 'cat.joker': '王牌 (2)',
+    'cat.l1': 'L1 画像 (12)', 'cat.l2': 'L2 根源 (6)', 'cat.l3': 'L3 情绪 (8)',
+    'when.use': '何时用', 'script.example': '话术示例', 'risk.note': '注意',
+    'detection': '识别信号', 'reframe': '重新定义', 'avoid': '避免',
+    'phase': '阶段', 'feeling': '感受', 'meaning': '代表意义', 'why': '重要原因',
+    'rubric.profile': '客户画像', 'rubric.root': '根本原因', 'rubric.reframe': '重新定义', 'rubric.close': '安全成交', 'rubric.authority': '权威感',
+    'total.score': '总分', 'recorded': '演练已记录', 'feedback.title': '改进建议',
+    'no.match': '没有匹配的卡', 'fb.placeholder1': '没有具体反馈',
+    'apikey.title': '设置 Anthropic API 密钥',
+    'apikey.body': '这个应用用 Claude (Anthropic) 做 AI 客户扮演和评分。你的 API 密钥只存在这台设备的浏览器里 永远不会离开设备 也不会上我们服务器。密钥以 sk-ant- 开头。在 console.anthropic.com 获取。',
+    'apikey.warn': '重要 只在你信任的设备上输入密钥。任何能访问这台设备的人都能看到。建议在 Anthropic 控制台设置消费限额。',
+    'apikey.placeholder': 'sk-ant-api03-...',
+    'apikey.save': '保存密钥',
+    'apikey.skip': '暂时跳过 (AI 不会工作)',
+    'apikey.invalid': '密钥格式看起来不对 应该以 sk-ant- 开头',
+    'apikey.testing': '验证密钥中...',
+    'apikey.test_fail': '密钥不工作 请检查后重试',
+    'apikey.test_ok': '密钥可用 已保存',
+    'settings.apikey': 'Anthropic API 密钥',
+    'settings.key_status_set': '密钥已设置 (尾号 {tail})',
+    'settings.key_status_unset': '未设置密钥 AI 无法工作',
+    'settings.update_key': '更新密钥',
+    'settings.clear_key': '清除密钥',
+    'settings.clear_confirm': '确认从本机清除 API 密钥',
+    'settings.about': '关于',
+    'settings.about_body': '独立版 Emax 销售演练应用 自带 Anthropic API 密钥。数据存在每台设备本地。AI 基于你们的 4D 成交系统 和 6R 客户旅程。',
+    'settings.cost_note': '成本估计 用 Claude Haiku 4.5 大约每次演练 0.01 美元。',
+    'no.key': 'AI 未配置 去设置页添加 Anthropic API 密钥。',
+    'hint.show': '教练提示',
+    'hint.hide': '隐藏提示',
+    'hint.loading': '思考中...',
+    'hint.label': '教练',
+    'hint.fail': '提示生成失败 请重试'
+  }
+};
+
+// ============ Data: Scenarios ============
+const SCENARIOS = [
+  { id: 'p3_price', level: 1, src: 'Persona 3', title_en: 'Price Sensitive Customer', title_zh: '价格敏感客户', profile_en: 'Mid-30s, can afford but cautious. Done basic facials elsewhere.', profile_zh: '三十多岁 能负担但谨慎 之前在别家做过基础护理', concern_en: 'Wants change but feels guilty spending on self.', concern_zh: '想改变但花钱在自己身上有罪恶感', open_en: 'Eight thousand eight hundred for this package? That is too expensive. The clinic next door only charges four something for similar treatments.', open_zh: '你们这个项目八千八啊 太贵了吧 我隔壁那家才四千多 效果不也差不多' },
+  { id: 'p6_try', level: 1, src: 'Persona 6', title_en: 'Wants to Try First', title_zh: '想先试一下', profile_en: 'New customer. Low to medium budget. Soft and uncertain.', profile_zh: '新客户 预算低到中 性格偏软 不确定', concern_en: 'Afraid of committing to the wrong treatment.', concern_zh: '怕选错方案 不敢承诺', open_en: 'Can I just try one session first? I am not sure if this will work for me.', open_zh: '我先试一次可以吗 我不确定这个适不适合我' },
+  { id: 'p7_compete', level: 1, src: 'Persona 7', title_en: 'Competitor Shopper', title_zh: '比价客户', profile_en: 'Compares everywhere. Just wants the best deal.', profile_zh: '到处比价 只想要最划算的', concern_en: 'Needs strong positioning and unique value to commit.', concern_zh: '需要强定位和独特价值才会下决定', open_en: 'Other clinic is running a promo at half this price. Can you match it?', open_zh: '别家现在搞活动 半价就行了 你们能不能做到' },
+  { id: 'p8_husband', level: 1, src: 'Persona 8', title_en: 'Husband-Controlled', title_zh: '需要先问老公', profile_en: 'Submissive, anxious. Defers big decisions.', profile_zh: '比较顺从 焦虑 大决定不敢自己做', concern_en: 'Approval seeking. Feels selfish spending on self.', concern_zh: '寻求许可 觉得花钱在自己身上很自私', open_en: 'I need to ask my husband first. He handles the budget at home.', open_zh: '我得先问问我老公 家里都是他管钱' },
+  { id: 'p10_skeptic', level: 1, src: 'Persona 10', title_en: 'Skeptical Customer', title_zh: '怀疑型客户', profile_en: 'Tried and failed at many clinics. Guarded.', profile_zh: '在很多家试过都没用 戒心很重', concern_en: 'Fear of disappointment. Low institutional trust.', concern_zh: '怕再次失望 对机构信任度低', open_en: 'I do not trust clinics anymore. Last time they all just sold me packages and nothing worked.', open_zh: '我已经不相信美容院了 之前几家都是卖完套餐就没下文了 一点效果都没有' },
+  { id: 'l2_2_trust', level: 2, src: 'L2 #2', title_en: 'Do Not Trust Clinics', title_zh: '不相信美容院', profile_en: 'Past trauma. Tells you another clinic is better.', profile_zh: '过去有阴影 一直说别家更好', concern_en: 'Trauma from past, low trust. Surface objection is comparison.', concern_zh: '过去的创伤导致信任度低 表面异议是比较', open_en: 'That other clinic has a better doctor than yours. And their promo is cheaper. Why should I do it here?', open_zh: '另外那家的医生比你们好 价格也更便宜 我为什么要在你们这里做' },
+  { id: 'l2_3_results', level: 2, src: 'L2 #3', title_en: 'What If No Results', title_zh: '怕没效果', profile_en: 'Repeats "will it work". Fear of failure.', profile_zh: '反复问会不会有效 怕失败', concern_en: 'Does not trust outcome, does not trust own ability to commit.', concern_zh: '不相信结果 也不相信自己能坚持', open_en: 'I want to see fast results. Last time I did treatments for months and saw nothing. Can you guarantee this works?', open_zh: '我想要快速看到效果 上次我做了几个月一点变化都没有 你能保证这次有效果吗' },
+  { id: 'l3_b_angry', level: 3, src: 'L3 Type B', title_en: 'Angry About Price', title_zh: '对价格发火', profile_en: 'Customer is heated. Feels overcharged or manipulated.', profile_zh: '情绪激动 觉得被宰或被套路', concern_en: 'Emotional reaction to price. Black tortoise pattern.', concern_zh: '对价格的情绪反应 容易让顾问慌', open_en: 'This price is crazy. Do you think I am stupid? You all just mark up so high.', open_zh: '这个价格简直离谱 你当我傻吗 你们就是乱加价' },
+  { id: 'l3_c_stop', level: 3, src: 'L3 Type C', title_en: 'Stop Selling Me', title_zh: '别推销我', profile_en: 'Frame battle. Customer pushing back hard.', profile_zh: '心理博弈 客户强势顶回来', concern_en: 'Fed up with sales pitch. Wants advisor, not seller.', concern_zh: '受够了推销话术 想要顾问 不是销售员', open_en: 'Stop selling me. I came here for a consultation, not to be pressured into a package.', open_zh: '别再推销了 我来咨询的 不是来被你们压套餐的' },
+  { id: 'l3_h_emotional', level: 3, src: 'L3 Type H', title_en: 'Emotional Customer', title_zh: '情绪化客户', profile_en: 'Postpartum, breakup, aging anxiety. Vulnerable.', profile_zh: '产后 分手 衰老焦虑 处于脆弱状态', concern_en: 'Needs containment and care, not pitch.', concern_zh: '需要被接住和照顾 不是推销', open_en: 'I look in the mirror and I do not recognize myself anymore. I do not know what to do.', open_zh: '我照镜子的时候都不认识自己了 我不知道该怎么办' }
+];
+
+// ============ Data: 4D Cards (compact form for both UI and prompt) ============
+const FRAME_CARDS = [
+  { id: 'f1', cat: 'frame', name_en: 'Authoritative Framing (Expert)', name_zh: '权威框架 (专家)', when_en: 'Customer is confused or all over the place', when_zh: '客户混乱 没方向', body_en: 'Behave like a doctor or architect, not a salesgirl. Make her feel "she knows what she is doing, I just follow." Present ONE main path, not 5 options. Eye contact, calm voice, slow pace. Close with a clear choice, not an open question.', body_zh: '像医生或建筑师 不是售货员 让她感觉 "她很专业 我跟着走就行" 给一条主路 不是五个选项 眼神 语速 沉稳 用清楚的选择收尾', risk_en: 'Do not ask "so what do you want to do?" Do not sound unsure.', risk_zh: '别问 "那你想做什么" 别犹豫不决' },
+  { id: 'f2', cat: 'frame', name_en: 'Pain Uncovering + Future Painting', name_zh: '挖痛点 + 描绘未来', when_en: 'Customer is emotional, insecure', when_zh: '客户情绪化 没自信', body_en: 'Pull out emotional truth behind the skin problem. Then paint how her life or identity changes. Ask "when did this start to bother you most?" Then "imagine 6 months later, your jawline is sharper, how would that change how you show up at work?"', body_zh: '挖出皮肤问题背后的情绪 然后描绘她生活或身份的改变 "什么时候开始最困扰你" "想象六个月后 你的下颌更清晰 你工作的状态会有什么不同"', risk_en: 'Do not jump to package. Stay in emotional space without being awkward.', risk_zh: '别直接跳到套餐 在情绪空间多停一会 别尴尬' },
+  { id: 'f3', cat: 'frame', name_en: 'Value Anchoring + ROI Framing', name_zh: '价值锚定 + ROI 框架', when_en: 'Customer is price sensitive', when_zh: '客户对价格敏感', body_en: 'Shift from "expensive or not" to "worth it or not". Make her see treatment as investment. "This concern has been with you for how many years already?" "If we do not treat it properly now, it becomes harder and more expensive later."', body_zh: '把 "贵不贵" 转成 "值不值" 让她看作投资 "这个困扰你多少年了" "现在不解决 后面更贵更难"', risk_en: 'Do not say "ya, a bit expensive la". Do not panic and discount.', risk_zh: '别说 "对啊 有点贵" 别慌着打折' },
+  { id: 'f4', cat: 'frame', name_en: 'Strong Technical Explanation', name_zh: '专业技术解释', when_en: 'Customer is analytical, asks how it works', when_zh: '客户偏理性 问原理', body_en: 'Clear, simple explanation without losing authority. "Let me explain in 3 parts: surface, middle, deeper layer." Use visual analogies. Always link back to this customer specifically.', body_zh: '简单清晰 但不失权威 "我分三层说: 表层 中层 深层" 用比喻 永远链回到这位客户的情况', risk_en: 'Never say "I am not sure but...". Hold frame even if unsure.', risk_zh: '别说 "我也不确定但是" 不确定也要保持框架' },
+  { id: 'f5', cat: 'frame', name_en: 'Competitive Framing', name_zh: '竞争框架', when_en: 'Customer compares brands', when_zh: '客户比较品牌', body_en: 'Position as superior choice without bad-mouthing others. "We do not just do facial. We build a treatment roadmap and monitor progress." "Other clinics may be cheaper per session, but we are cheaper per result."', body_zh: '定位为更优选择 但不踩同行 "我们不止做护理 我们设计疗程路线图并追踪进度" "别家可能每次便宜 但我们每次结果更便宜"', risk_en: 'Do not shrink or panic when competitor is cheaper.', risk_zh: '别人便宜的时候 不要慌 不要退缩' },
+  { id: 'f6', cat: 'frame', name_en: 'Empowerment Framing', name_zh: '赋能框架', when_en: 'Customer says "must ask husband"', when_zh: '客户说 "要问老公"', body_en: 'Validate her reality, then gently shift to self-ownership. "I understand, your husbands opinion matters." "Why not start with a smaller plan you can decide on your own first?" Never attack husband or family.', body_zh: '先认同 再温和转向自我赋权 "我理解 你老公的意见很重要" "要不先从一个你能自己决定的小方案开始" 绝不攻击老公', risk_en: 'Never say "do not let your husband control you".', risk_zh: '绝对不要说 "别让老公控制你"' }
+];
+
+const VALUE_CARDS = [
+  { id: 'v1', cat: 'value', name_en: 'Treatment Plan (Why it works)', name_zh: '疗程逻辑 (为什么有效)', when_en: 'Customer doubts effectiveness', when_zh: '客户怀疑效果', body_en: 'Rebuild trust through science and logic. "This works because it targets the root cause at the dermal layer, not just the surface."', body_zh: '用科学和逻辑重建信任 "这个有效是因为它针对真皮层的根本原因 不只是表面"', risk_en: 'Avoid jargon dump. Check in: "does that make sense?"', risk_zh: '别堆专业词 要确认' },
+  { id: 'v2', cat: 'value', name_en: 'Timeline (Expectation Clarity)', name_zh: '时间线 (清晰预期)', when_en: 'Customer asks "how fast"', when_zh: '客户问 "多快见效"', body_en: 'Paint a visual journey. "In 4 weeks, smoother texture. By 8 weeks, deeper repairs kick in."', body_zh: '画出过程 "4 周后 肤质变细腻 8 周后深层修复启动"', risk_en: 'Do not promise instant.', risk_zh: '别承诺立竿见影' },
+  { id: 'v3', cat: 'value', name_en: 'Social Proof (Real Cases)', name_zh: '社会证明 (真实案例)', when_en: 'Customer says "not sure it will work for me"', when_zh: '客户说 "不知道适不适合我"', body_en: 'Match her pain to a similar success case. "This is the exact plan our long-term clients with similar conditions followed."', body_zh: '用相似客户的成功故事匹配她的痛点', risk_en: 'Do not invent stories. Protect privacy.', risk_zh: '别编故事 保护隐私' },
+  { id: 'v4', cat: 'value', name_en: 'Customisation (Tailored)', name_zh: '定制 (量身打造)', when_en: 'Customer feels skeptical or sensitive', when_zh: '客户怀疑或敏感', body_en: 'Drop 2-3 personalised observations from her consultation. "This plan is designed specifically for your triggers."', body_zh: '引用 2-3 个咨询时的具体观察 "这个方案是为你的特点设计的"', risk_en: 'Show you remember details.', risk_zh: '让她感觉你记住了细节' },
+  { id: 'v5', cat: 'value', name_en: 'Premium Standard & Brand', name_zh: '高端标准 + 品牌', when_en: 'Customer says "expensive"', when_zh: '客户说 "贵"', body_en: '"These are medical-grade protocols with clinically proven ingredients." "We are a 10 year old brand with backend customer protection systems."', body_zh: '"这是医疗级方案 临床验证成分" "我们是十年品牌 后台有完整的客户保护和安全机制"', risk_en: 'Do not apologize for price.', risk_zh: '不要为价格道歉' },
+  { id: 'v6', cat: 'value', name_en: 'Guidance (Partnership)', name_zh: '陪伴 (合作伙伴)', when_en: 'Customer is emotional, afraid to commit', when_zh: '客户情绪化 不敢承诺', body_en: 'Sell the relationship, not the package. "I will be with you through the journey."', body_zh: '卖的是关系 不是套餐 "我会陪你走完这段路"', risk_en: 'Stay professional. Do not become "best friend" mode.', risk_zh: '保持专业 别变成 "闺蜜模式"' }
+];
+
+const ROOT_CARDS = [
+  { id: 'r1', cat: 'root', name_en: 'Fear of Wasting Money', name_zh: '怕浪费钱', when_en: 'Says "expensive". Real fear is regret.', when_zh: '说 "贵" 但真正怕的是后悔', detect_en: '"It is expensive"', detect_zh: '"太贵了"', body_en: 'Surface: "It is totally normal to feel that way." Deep: "Are you afraid of choosing the wrong plan again?" Reframe: "My job is to help you avoid mistakes. Real cost is feeling insecure another year."', body_zh: '表层: "这种感觉很正常" 深层: "你是不是怕又选错方案" 重塑: "我的工作是帮你避免错误"', risk_en: 'Do NOT push price. Do not minimize her fear.', risk_zh: '别推价格 别淡化她的担忧' },
+  { id: 'r2', cat: 'root', name_en: 'Fear of No Results', name_zh: '怕没效果', when_en: 'Repeats "will it work"', when_zh: '反复问 "会有效吗"', detect_en: '"Everyone says the same thing." "I want fast results."', detect_zh: '"大家都这么说" "我想快点看到效果"', body_en: 'Surface: "Lets clarify what results you want." Deep: "What specifically didnt work last time?" Reframe: "Progress at 4, 8, 12 weeks, clear milestones."', body_zh: '表层: "我们先理清你想要什么效果" 深层: "上次具体哪里没达到" 重塑: "4 周 8 周 12 周都有明确节点"', risk_en: 'No overselling. No unrealistic promises.', risk_zh: '别夸大 别承诺不切实际' },
+  { id: 'r3', cat: 'root', name_en: 'Fear of Commitment', name_zh: '怕坚持不下来', when_en: 'Says "busy", "no time"', when_zh: '说 "我很忙"', detect_en: '"I am busy", "no time later"', detect_zh: '"我很忙" "之后可能没空"', body_en: 'Surface: "Your schedule is packed, I get it." Deep: "Is your worry about time, or staying consistent?"', body_zh: '表层: "你时间确实紧" 深层: "你担心的是时间 还是坚持不下来"', risk_en: 'Do not pressure strict timetables.', risk_zh: '别压她按死板时间表' },
+  { id: 'r4', cat: 'root', name_en: 'Need to Ask Husband', name_zh: '要问老公', when_en: 'Defers decision to husband', when_zh: '把决定推给老公', detect_en: '"Let me check with husband"', detect_zh: '"我先问老公"', body_en: 'Deep: "Do you sometimes feel guilty investing in yourself?" Reframe: "This is not luxury, its maintenance. He wants you happy too."', body_zh: '深层: "你是不是有时候觉得为自己花钱很愧疚" 重塑: "这不是奢侈 是维护"', risk_en: 'Do not call it "luxury".', risk_zh: '别说这是 "奢侈"' },
+  { id: 'r5', cat: 'root', name_en: 'Not Emotionally Ready', name_zh: '今天情绪上没准备好', when_en: 'Blank stare, overwhelmed', when_zh: '神情空白', detect_en: '"Let me try 1-2 more times first", "I dont know"', detect_zh: '"我先再试一两次" "我不知道"', body_en: 'Deep: "Is it more that emotionally youre not ready today?" Reframe: "Lets take the first step gently."', body_zh: '深层: "是不是今天情绪上还没准备好" 重塑: "我们慢慢来"', risk_en: 'Do NOT push. Do not speed up.', risk_zh: '别推 别加快节奏' },
+  { id: 'r6', cat: 'root', name_en: 'Do Not Trust Clinics', name_zh: '不相信美容院', when_en: 'Past bad experience', when_zh: '过去的坏体验', detect_en: '"All same one", "Last time they just sold"', detect_zh: '"都一样" "上次都是推销"', body_en: 'Deep: "What specifically happened last time?" Reframe: "We dont just do facial. We build a roadmap and monitor progress."', body_zh: '深层: "上次具体发生了什么" 重塑: "我们不止做护理 我们设计路线图"', risk_en: 'Do not bad-mouth competitors.', risk_zh: '别踩同行' }
+];
+
+const CLOSE_CARDS = [
+  { id: 'c1', cat: 'close', lvl: 1, name_en: 'Choice Close', name_zh: '选择成交', when_en: 'Customer accepted plan, has not committed', when_zh: '客户认可方案 但没下决定', body_en: '"6-session or 12-session plan?" "5388 or 8788 package?"', body_zh: '"6 次还是 12 次" "5388 还是 8788"', risk_en: 'Do not give two same-priced options.', risk_zh: '别给两个价格一样的选项' },
+  { id: 'c2', cat: 'close', lvl: 1, name_en: 'Goal Anchored Close', name_zh: '目标成交', when_en: 'Customer stated her goal earlier', when_zh: '客户讲过自己的目标', body_en: '"Since your goal is to look your best by CNY, the 6-month plan is the most effective. Shall we begin today?"', body_zh: '"既然你的目标是新年前最好状态 6 个月方案最有效 今天开始就刚好"', risk_en: 'Goal must be HER goal, not yours.', risk_zh: '目标必须是她说过的' },
+  { id: 'c3', cat: 'close', lvl: 1, name_en: 'Silence Close', name_zh: '沉默成交', when_en: 'After presenting price', when_zh: '报完价格之后', body_en: 'Shut up, smile, hold the space. Silence = confidence.', body_zh: '闭嘴 微笑 保持空间 沉默 = 信心', risk_en: 'Do not break first. Hold under 10 seconds.', risk_zh: '别先开口 撑住 不超过 10 秒' },
+  { id: 'c4', cat: 'close', lvl: 2, name_en: 'Assumptive Close', name_zh: '假设成交', when_en: 'Customer leaning yes', when_zh: '客户偏向 yes', body_en: '"Lets book your first session. Weekday or weekend?"', body_zh: '"那我帮你约第一次 工作日还是周末"', risk_en: 'Do not use too early.', risk_zh: '别用太早' },
+  { id: 'c5', cat: 'close', lvl: 2, name_en: 'Priority Close', name_zh: '优先级成交', when_en: 'Need to test commitment', when_zh: '需要测决心', body_en: '"On a scale of 1-10, how important is fixing this?" Customer: 8. "Since its 8 for you, lets find a plan that fits your comfort."', body_zh: '"1 到 10 分 解决这个对你多重要" 8 "既然是 8 我们找一个你舒服的方案"', risk_en: 'If she says 4 or below, do not push.', risk_zh: '如果说 4 分以下 别推' },
+  { id: 'c6', cat: 'close', lvl: 2, name_en: 'Value Ladder Close', name_zh: '价值阶梯成交', when_en: 'Show options at different commitment levels', when_zh: '不同投入的选择', body_en: '"Heres the difference between RM1k, RM3k, RM5k solutions. Which level of results do you want?"', body_zh: '"1000 / 3000 / 5000 三种方案的差别在这"', risk_en: 'Three levels max.', risk_zh: '最多三档' },
+  { id: 'c7', cat: 'close', lvl: 3, name_en: 'Soft Close (Enrollment)', name_zh: '软性成交 (入门)', when_en: 'Customer hesitant on full commitment', when_zh: '客户对完整承诺犹豫', body_en: '"No pressure today. Lets begin with essential sessions first."', body_zh: '"今天没有压力 我们先从基础几次开始"', risk_en: 'This is not surrender. Still secure next visit.', risk_zh: '这不是放弃 还是要锁定下一次' },
+  { id: 'c8', cat: 'close', lvl: 3, name_en: 'Reservation Close (Deposit)', name_zh: '保留成交 (押金)', when_en: 'Customer warm but needs to think', when_zh: '客户偏暖 但需要再想想', body_en: '"Why dont we secure your plan with a small deposit? This locks in your price."', body_zh: '"先用小额押金锁定方案 锁住价格"', risk_en: 'Be clear deposit terms.', risk_zh: '押金条款要透明' },
+  { id: 'c9', cat: 'close', lvl: 3, name_en: 'Future Close', name_zh: '未来成交', when_en: 'Customer needs vision of after', when_zh: '客户需要看到 "之后"', body_en: '"In 3 months, your redness will reduce a lot and you will feel confident without makeup."', body_zh: '"三个月后 你的泛红会少很多 不化妆也有自信"', risk_en: 'Picture must be realistic.', risk_zh: '画面要真实' },
+  { id: 'c10', cat: 'close', lvl: 4, name_en: 'Walkaway Authority Close', name_zh: '撤退权威成交', when_en: 'Customer truly cannot afford', when_zh: '客户真不能负担', body_en: '"No problem. I want you to decide comfortably. When you are ready, come back to me personally."', body_zh: '"没关系 我希望你舒服地决定 等你准备好 直接来找我"', risk_en: 'Must mean it. Not a guilt trap.', risk_zh: '要真心 不是套话陷阱' }
+];
+
+const ELITE_CARDS = [
+  { id: 'e1', cat: 'elite', name_en: '"Lets slow down for a moment, whats unclear?"', name_zh: '"我们慢一点 哪里你觉得不清楚"', when_en: 'Customer irritated', when_zh: '客户烦躁', body_en: 'De-escalates and resets control.', body_zh: '降温 重新拿回掌控' },
+  { id: 'e2', cat: 'elite', name_en: '"May I show you what this price is built on?"', name_zh: '"我能让你看看这个价格是怎么来的吗"', when_en: 'Price shock', when_zh: '价格冲击', body_en: 'Moves customer from emotion to logic.', body_zh: '把客户从情绪拉到逻辑' },
+  { id: 'e3', cat: 'elite', name_en: '"Lets pause the sales part, can I share the truth even if you dont buy?"', name_zh: '"我们先暂停推销 我可以分享一下你皮肤的真实情况吗"', when_en: '"Stop selling me"', when_zh: '"别推销我"', body_en: 'Counter-frame. Shifts to advisor.', body_zh: '反向框架 切到顾问身份' },
+  { id: 'e4', cat: 'elite', name_en: '"If that came across strong, my intention is to understand"', name_zh: '"如果我说得太直接 我的意思是想了解你"', when_en: 'Insecure customer reacted harshly', when_zh: '没安全感的客户被刺到', body_en: 'Creates safety.', body_zh: '建立安全感' },
+  { id: 'e5', cat: 'elite', name_en: '"I feel youre holding something back, whats the real worry?"', name_zh: '"我感觉你有什么没说 真正担心的是什么"', when_en: 'Silent customer', when_zh: '沉默客户', body_en: 'Extracts hidden objections.', body_zh: '挖出隐藏异议' },
+  { id: 'e6', cat: 'elite', name_en: '"Great question, let me show you why this works"', name_zh: '"好问题 我让你看看为什么有效"', when_en: 'Expertise challenged', when_zh: '专业被挑战', body_en: 'Demonstrate, do not defend.', body_zh: '展示 不要辩解' },
+  { id: 'e7', cat: 'elite', name_en: '"Before any price, let me analyze properly so I dont mislead you"', name_zh: '"报价之前 我先好好分析 免得误导你"', when_en: 'Dominating customer', when_zh: '强势客户', body_en: 'Resets process.', body_zh: '重置流程' },
+  { id: 'e8', cat: 'elite', name_en: '"You\'re safe here, take your time"', name_zh: '"你在这里很安全 慢慢来"', when_en: 'Emotional customer', when_zh: '情绪化客户', body_en: 'Whats affecting you most right now?', body_zh: '现在让你最难受的是什么' },
+  { id: 'e9', cat: 'elite', name_en: '"Your goal matters, what outcome is most important in 3-6 months?"', name_zh: '"你的目标对我很重要 3 到 6 个月内最重要的是什么"', when_en: 'Re-center conversation', when_zh: '把对话拉回中心', body_en: 'Refocus on her desire.', body_zh: '重新聚焦在她的渴望' },
+  { id: 'e10', cat: 'elite', name_en: '"Lets work with whats realistic, tell me your comfortable budget"', name_zh: '"我们做你能接受的 跟我说你舒服的预算范围"', when_en: 'Discover budget', when_zh: '探到预算', body_en: 'Elegant budget discovery.', body_zh: '优雅探预算' }
+];
+
+const JOKER_CARDS = [
+  { id: 'j1', cat: 'joker', name_en: '4S Emotional Disarm Protocol', name_zh: '4S 情绪化解协议', when_en: 'Customer becomes emotionally activated', when_zh: '客户情绪被激活', body_en: 'SLOW: "I hear you." SOFTEN: "Lets pause for a moment." SEEK: "What made you feel uncomfortable?" STEER: "My goal is to guide you, not pressure."', body_zh: 'SLOW 慢: "我听到了" SOFTEN 柔: "我们暂停一下" SEEK 探: "是什么让你不舒服" STEER 引: "我的目标是引导你 不是压你"', risk_en: 'Do not skip steps.', risk_zh: '别跳步' },
+  { id: 'j2', cat: 'joker', name_en: 'The 10 Rules of Elite Sales', name_zh: '精英销售十条铁律', when_en: 'Daily reminder', when_zh: '日常自我提醒', body_en: '1 Never apologize for price. 2 Never lose your frame. 3 Slow down when customer speeds up. 4 Ask for the real concern behind the objection. 5 Never let emotion hijack the consult. 6 Validate, then steer. 7 Explain, not defend. 8 Prescribe, not suggest. 9 Control conversation direction. 10 Always secure a close, full or future.', body_zh: '一 不为价格道歉 二 不失框架 三 客户加速 你减速 四 问异议背后真正担忧 五 不让情绪绑架咨询 六 先认同 再引导 七 解释 不辩解 八 处方 不是建议 九 控制对话方向 十 永远收尾', risk_en: 'Print and read every morning.', risk_zh: '打印出来每天早上看' }
+];
+
+const ALL_4D = [...FRAME_CARDS, ...VALUE_CARDS, ...ROOT_CARDS, ...CLOSE_CARDS, ...ELITE_CARDS, ...JOKER_CARDS];
+
+const SIX_R = [
+  { id: 'reassure', en_name: 'Reassure', zh_name: '安心感', phase_en: 'Pre-consult', phase_zh: '咨询前', feel_en: 'Warm and welcoming', feel_zh: '温暖 安心', mean_en: 'Lower their guard and build trust before consultation begins.', mean_zh: '在正式咨询前先放下客户的戒心 建立信任', why_en: 'Without trust, conversion is low.', why_zh: '没有信任 就没有转化' },
+  { id: 'recommend', en_name: 'Recommend', zh_name: '专业感', phase_en: 'Consultation', phase_zh: '咨询', feel_en: 'Expertise', feel_zh: '专业 清晰', mean_en: 'Doctor and Consultant give clear diagnosis and plan, no overclaim.', mean_zh: '医生与顾问提供清晰诊断与方案 不夸大', why_en: 'Shows true professionalism.', why_zh: '展现真正的专业与可信度' },
+  { id: 'result', en_name: 'Result', zh_name: '效果感', phase_en: 'Treatment', phase_zh: '治疗', feel_en: 'Certainty', feel_zh: '稳定 确定感', mean_en: 'Deliver visible, consistent results through accurate technique and steady service.', mean_zh: '以精准技术 稳定服务 提供可见效果', why_en: 'People pay for outcomes.', why_zh: '客户付费是为了结果' },
+  { id: 'reengage', en_name: 'Re-engage / Revisit', zh_name: '回访感', phase_en: 'Closing / Retention', phase_zh: '复购', feel_en: 'Care', feel_zh: '关心 重视', mean_en: 'Not just closing sales. Invitation to continue the journey.', mean_zh: '不只是 "成交" 而是邀请客户继续疗程旅程', why_en: 'Revisit gives more opportunities to do what is right.', why_zh: '客户回访 = 更多机会做对的事' },
+  { id: 'refer', en_name: 'Refer', zh_name: '信任感', phase_en: 'Advocacy', phase_zh: '推荐', feel_en: 'Trust', feel_zh: '信任 肯定', mean_en: 'Customers become brand promoters.', mean_zh: '客户愿意主动介绍朋友', why_en: 'Low cost per acquisition, high lifetime value.', why_zh: '获客成本低 客户终身价值高' },
+  { id: 'recover', en_name: 'Recover', zh_name: '修复感', phase_en: 'Post-Treatment', phase_zh: '术后', feel_en: 'Sincere apologetic', feel_zh: '真诚 负责', mean_en: 'Take ownership, respond sincerely, solve problems quickly.', mean_zh: '勇于承担 真诚回应 快速解决问题', why_en: 'Rebuild trust.', why_zh: '有效挽回信任' }
+];
+
+const L1_PERSONAS = [
+  { n: 1, name_en: 'I MUST FIX THIS NOW buyer', name_zh: '"我必须现在搞定" 买家', tend: 'High', budget: 'RM6k-10k', obj_en: 'Which package is better?', obj_zh: '哪个套餐更好', sol_en: 'Lift, tighten, collagen rebuild', sol_zh: '提升 紧致 胶原重建' },
+  { n: 2, name_en: 'Highly Emotional Insecure', name_zh: '高度情绪化 没自信', tend: 'Medium', budget: 'RM2k-5k', obj_en: 'Let me think first', obj_zh: '我先想想', sol_en: 'Brighten, smooth, glow', sol_zh: '提亮 细腻 光泽' },
+  { n: 3, name_en: 'Price Sensitive (can afford)', name_zh: '价格敏感 (但能负担)', tend: 'Medium', budget: 'RM1k-3k', obj_en: 'Its expensive', obj_zh: '太贵了', sol_en: 'Repair, lighten, renew', sol_zh: '修复 提亮 焕新' },
+  { n: 4, name_en: 'Logical Analytical Engineer', name_zh: '理性分析型', tend: 'Medium', budget: 'RM3k-8k', obj_en: 'How does this work scientifically?', obj_zh: '这个原理是什么', sol_en: 'Mechanism, long-term stability', sol_zh: '机理 长期稳定' },
+  { n: 5, name_en: 'Busy Corporate Executive', name_zh: '忙碌的企业高管', tend: 'High', budget: 'RM5k-15k', obj_en: 'I have no time', obj_zh: '我没时间', sol_en: 'Fast, efficient, premium', sol_zh: '快速 高效 高端' },
+  { n: 6, name_en: 'Want to Try First', name_zh: '想先试一下', tend: 'Low-Med', budget: 'RM500-1.5k', obj_en: 'I try first session', obj_zh: '我先试一次', sol_en: 'Progress, transformation timeline', sol_zh: '进度 转变时间线' },
+  { n: 7, name_en: 'Competitor Shopper', name_zh: '比价客户', tend: 'Medium', budget: 'RM2k-4k', obj_en: 'Other brand cheaper', obj_zh: '别家更便宜', sol_en: 'Branding, exclusive tech', sol_zh: '品牌 独家技术' },
+  { n: 8, name_en: 'Husband Controlled', name_zh: '老公掌控型', tend: 'Medium', budget: 'RM2k-10k', obj_en: 'I must ask my husband', obj_zh: '我要问我老公', sol_en: 'Confidence, self-care', sol_zh: '自信 自我照顾' },
+  { n: 9, name_en: 'Young Instagram Girl', name_zh: '年轻 IG 女孩', tend: 'Med-High', budget: 'RM1.5k-3k', obj_en: 'My friends clinic cheaper', obj_zh: '我朋友那家更便宜', sol_en: 'Glow, smooth', sol_zh: '光泽 细腻' },
+  { n: 10, name_en: 'Skeptical Customer', name_zh: '怀疑型客户', tend: 'Low', budget: 'RM1k-2k', obj_en: 'I dont trust treatments', obj_zh: '我不信这些疗程', sol_en: 'Evidence, case studies', sol_zh: '证据 案例研究' },
+  { n: 11, name_en: 'Premium Buyer', name_zh: '高端买家', tend: 'Very High', budget: 'RM8k-20k', obj_en: 'No strong objection', obj_zh: '没强烈异议', sol_en: 'Lift, premium, anti-aging', sol_zh: '提升 高端 抗衰' },
+  { n: 12, name_en: 'I Dont Feel Good Enough', name_zh: '"我觉得自己不够好"', tend: 'Medium', budget: 'RM1.5k-3k', obj_en: 'I dont know if it will work for me', obj_zh: '不知道适不适合我', sol_en: 'Confidence, new identity', sol_zh: '自信 新身份' }
+];
+
+const L2_ROOT = [
+  { n: 1, t_en: 'Im scared of wasting money', t_zh: '我怕浪费钱', d_en: 'Fear, not price', d_zh: '怕的不是钱 是后悔', cue_en: 'Its expensive', cue_zh: '"太贵了"' },
+  { n: 2, t_en: 'I dont trust clinics', t_zh: '我不信美容院', d_en: 'Trauma from past', d_zh: '过去的创伤', cue_en: 'That clinic is better', cue_zh: '"那家更好"' },
+  { n: 3, t_en: 'What if no results', t_zh: '万一没效果', d_en: 'Fear of failure', d_zh: '怕失败', cue_en: 'I want fast results', cue_zh: '"我要快效果"' },
+  { n: 4, t_en: 'Cannot commit to schedule', t_zh: '没法坚持', d_en: 'Identity issue', d_zh: '身份认同问题', cue_en: 'Im busy, no time later', cue_zh: '"忙" "没时间"' },
+  { n: 5, t_en: 'My husband very strict', t_zh: '我老公很严', d_en: 'Approval seeking', d_zh: '寻求许可', cue_en: 'Let me check with husband', cue_zh: '"问老公"' },
+  { n: 6, t_en: 'Dont want to be disappointed again', t_zh: '不想再失望', d_en: 'Emotional protection', d_zh: '情绪保护', cue_en: 'Overwhelmed, emotion over logic', cue_zh: '不知所措 情绪大于逻辑' }
+];
+
+const L3_EMO = [
+  { n: 'A', t_en: 'Defensive or irritated', t_zh: '防御或烦躁', frame_en: 'Hold frame without apologizing', frame_zh: '保持框架 不道歉', script_en: 'I hear you, we can go at your pace.', script_zh: '我听到了 我们按你的节奏来' },
+  { n: 'B', t_en: 'Angry about price', t_zh: '对价格发火', frame_en: 'Reframe to value, not discount', frame_zh: '重塑价值 不打折', script_en: 'I understand why it feels high, may I show you what the price is based on?', script_zh: '我理解你为什么觉得高 我能不能让你看看这个价格是怎么来的' },
+  { n: 'C', t_en: 'Stop selling me', t_zh: '别推销我', frame_en: 'Advisor frame, not seller', frame_zh: '顾问身份 不是销售', script_en: 'Lets pause the sales part. Can I share what your skin really needs, even if you dont buy today?', script_zh: '我们先暂停推销 我可以分享一下你的皮肤真正需要什么' },
+  { n: 'D', t_en: 'Insecure, reacts harshly', t_zh: '没安全感 反应激烈', frame_en: 'Care and safety, not debate', frame_zh: '关怀和安全 不是辩论', script_en: 'Im sorry if that came across blunt. I ask because I want to understand you better.', script_zh: '如果我说得太直接 抱歉 我想更了解你' },
+  { n: 'E', t_en: 'Cold, silent, uninterested', t_zh: '冷淡 沉默', frame_en: 'Surface hidden concern', frame_zh: '挖出隐藏担忧', script_en: 'I feel youre a little unsure right now, whats going on in your mind?', script_zh: '我感觉你有点不确定 你心里在想什么' },
+  { n: 'F', t_en: 'Challenges your expertise', t_zh: '挑战你的专业', frame_en: 'Demonstrate, do not defend', frame_zh: '展示 不辩解', script_en: 'Great question, let me show you exactly why this works.', script_zh: '好问题 我让你看看为什么这个有效' },
+  { n: 'G', t_en: 'Tries to dominate', t_zh: '想压制顾问', frame_en: 'Reset control with process', frame_zh: '用流程重置主导', script_en: 'Before I quote, let me check your skin properly.', script_zh: '报价之前我先好好检查' },
+  { n: 'H', t_en: 'Becomes emotional (crying)', t_zh: '情绪化 (落泪)', frame_en: 'Containment and care', frame_zh: '接住和照顾', script_en: 'Youre safe here. Take your time.', script_zh: '你在这里很安全 慢慢来' }
+];
+
+// ============ State ============
+const STATE = {
+  lang: 'en', tab: 'roleplay', scenario: null, conversation: [], voiceTranscript: '',
+  recording: false, recognition: null, knowledgeView: '4d', knowledgeCat: 'frame',
+  knowledgeSearch: '', busy: false, lastRaw: ''
+};
+
+// ============ Storage ============
+const SK = { sessions: 'emax_sessions_v3', lang: 'emax_lang_v3', apiKey: 'emax_anthropic_key_v3' };
+function loadSessions() { try { return JSON.parse(localStorage.getItem(SK.sessions) || '[]'); } catch (e) { return []; } }
+function saveSession(s) { const all = loadSessions(); all.unshift({ ...s, ts: Date.now() }); localStorage.setItem(SK.sessions, JSON.stringify(all.slice(0, 100))); }
+function loadLang() { return localStorage.getItem(SK.lang) || 'en'; }
+function saveLang(l) { localStorage.setItem(SK.lang, l); }
+function loadKey() { return localStorage.getItem(SK.apiKey) || ''; }
+function saveKey(k) { localStorage.setItem(SK.apiKey, k); }
+function clearKey() { localStorage.removeItem(SK.apiKey); }
+
+// ============ Helpers ============
+function t(key) { return (I18N[STATE.lang] && I18N[STATE.lang][key]) || (I18N.en[key] || key); }
+function tx(en, zh) { return STATE.lang === 'zh' ? (zh || en) : en; }
+function escapeHtml(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// ============ Anthropic API ============
+const MODEL = 'claude-haiku-4-5-20251001';
+
+function buildSystemPrompt() {
+  const summarize4D = (cards, label) => `${label}:\n` + cards.map(c => `- ${c.name_en} (${c.name_zh}): when ${c.when_en}. Script: ${c.body_en}`).join('\n');
+  const summarizePersonas = () => 'L1 Personas: ' + L1_PERSONAS.map(p => `${p.n}.${p.name_en} (obj: ${p.obj_en})`).join('; ') + '\nL2 Root: ' + L2_ROOT.map(p => `${p.n}.${p.t_en} (cue: ${p.cue_en})`).join('; ') + '\nL3 Emotional: ' + L3_EMO.map(p => `${p.n}.${p.t_en} -> ${p.frame_en}`).join('; ');
+  const summarize6R = () => SIX_R.map(s => `${s.en_name} (${s.zh_name}, ${s.phase_en}): ${s.mean_en}`).join('\n');
+
+  return `You are the AI brain of the Emax Sales Drill app. Emax is an aesthetic medical clinic. You roleplay as customers and grade sales performance using the Emax 4D Closing System.
+
+=== EMAX 4D CLOSING SYSTEM ===
+The 4D system: Profile -> Root Cause -> Reframe -> Safe Close. 40 consultant cards across 6 categories.
+
+${summarize4D(FRAME_CARDS, 'FRAME CARDS (set tone)')}
+
+${summarize4D(VALUE_CARDS, 'VALUE CARDS (build value)')}
+
+${summarize4D(ROOT_CARDS, 'ROOT CARDS (handle root objections)')}
+
+${summarize4D(CLOSE_CARDS, 'CLOSING CARDS (named closes)')}
+
+${summarize4D(ELITE_CARDS, 'ELITE REFRAME SCRIPTS')}
+
+${summarize4D(JOKER_CARDS, 'JOKER CARDS')}
+
+=== 26 CUSTOMER PERSONAS ===
+${summarizePersonas()}
+
+=== 6R CUSTOMER JOURNEY ===
+${summarize6R()}
+
+=== MARKET CONTEXT ===
+The market shifted from beauty desire (relationship + package selling worked) to medical trust (regulation, safety, fear conversion, doctor authority required). Sales team is still using old pattern: relationship + soft pressure. Result: low new customer enrollment and rising refunds without service complaints. They need: structured clinical consultant approach, qualified close, compliance-safe wording, named close from 4D library.
+
+=== YOUR MODES ===
+
+MODE A - CUSTOMER ROLEPLAY:
+When the user message starts with [ROLEPLAY] or asks you to play a customer, stay in character. Reply naturally, 1-3 sentences. Push back authentically. Do not break character. Do not give advice. Do not explain you are AI. Use the language requested. Do not prefix your reply with "Customer:" or anything similar.
+
+MODE B - SALES COACH GRADER:
+When the user message starts with [GRADE] or asks for grading, score the SALES side of the transcript on 5 dimensions, each 0, 1, or 2:
+- profile: identified the customer type and real need (matched to one of the 26 personas)
+- root: uncovered real fear, not just surface objection
+- reframe: reframed instead of defending or apologizing
+- close_dim: attempted a specific named close from the 4D library (mention which card by name in feedback)
+- authority: held professional frame, no overpromise, escalated to doctor when needed
+
+Then write 3 specific improvement points citing exact moments from the conversation.
+
+CRITICAL: When grading, output ONLY valid JSON. No prose. No code fences. No preamble. No "Here is the grade:" prefix. Format exactly:
+{"profile":N,"root":N,"reframe":N,"close_dim":N,"authority":N,"feedback":["point 1","point 2","point 3"]}`;
+}
+
+const SYSTEM_PROMPT = buildSystemPrompt();
+
+async function callClaude(messages, maxTokens) {
+  const apiKey = loadKey();
+  if (!apiKey) throw new Error('NO_KEY');
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens || 800,
+      system: SYSTEM_PROMPT,
+      messages: messages
+    })
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`API ${response.status}: ${errText.slice(0, 300)}`);
+  }
+  const data = await response.json();
+  return (data.content && data.content[0] && data.content[0].text) || '';
+}
+
+async function testApiKey(keyValue) {
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': keyValue,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Say OK' }]
+      })
+    });
+    return r.ok;
+  } catch (e) { return false; }
+}
+
+function parseGradeJson(s) {
+  if (!s) return null;
+  let txt = s.replace(/```json\s*/gi, '').replace(/```\s*$/g, '').trim();
+
+  // Try strict JSON first
+  const a = txt.indexOf('{');
+  const b = txt.lastIndexOf('}');
+  if (a >= 0 && b > a) {
+    let candidate = txt.slice(a, b + 1);
+    try { return JSON.parse(candidate); } catch (e) {}
+    try {
+      candidate = candidate.replace(/,(\s*[}\]])/g, '$1').replace(/'/g, '"');
+      return JSON.parse(candidate);
+    } catch (e) {}
+  }
+
+  // Fallback: response may be truncated. Extract scores and feedback by regex.
+  const dims = ['profile', 'root', 'reframe', 'close_dim', 'authority'];
+  const scores = {};
+  dims.forEach(d => {
+    const m = txt.match(new RegExp('"' + d + '"\\s*:\\s*(\\d)'));
+    if (m) scores[d] = parseInt(m[1], 10);
+  });
+  if (Object.keys(scores).length < 3) return null;
+  // Default missing dims to 0
+  dims.forEach(d => { if (scores[d] === undefined) scores[d] = 0; });
+
+  // Extract feedback items
+  const feedback = [];
+  const fbStart = txt.indexOf('"feedback"');
+  if (fbStart >= 0) {
+    const after = txt.slice(fbStart);
+    const items = [...after.matchAll(/"((?:[^"\\]|\\.)+?)"/g)];
+    // first match is "feedback" itself, skip it
+    items.slice(1).forEach(m => {
+      const v = m[1].trim();
+      if (v && v.length > 5) feedback.push(v);
+    });
+  }
+  scores.feedback = feedback.slice(0, 5);
+  return scores;
+}
+
+// ============ API Key Modal ============
+function showApiKeyModal(initial) {
+  const host = document.getElementById('modal-host');
+  host.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal">
+        <h2>${t('apikey.title')}</h2>
+        <p>${t('apikey.body')}</p>
+        <div class="warn-box">${t('apikey.warn')}</div>
+        <input class="input" id="key-input" type="password" placeholder="${t('apikey.placeholder')}" autocomplete="off">
+        <div id="key-msg" style="font-size:12px; color:var(--danger); margin-top:6px; min-height:16px;"></div>
+        <div style="height:10px;"></div>
+        <button class="btn" id="key-save">${t('apikey.save')}</button>
+        ${initial ? `<div style="height:8px;"></div><button class="btn btn-secondary" id="key-skip">${t('apikey.skip')}</button>` : ''}
+      </div>
+    </div>
+  `;
+  const input = document.getElementById('key-input');
+  input.focus();
+  document.getElementById('key-save').onclick = async () => {
+    const v = (input.value || '').trim();
+    const msg = document.getElementById('key-msg');
+    if (!v.startsWith('sk-ant-')) { msg.textContent = t('apikey.invalid'); return; }
+    msg.style.color = 'var(--text-secondary)'; msg.textContent = t('apikey.testing');
+    const ok = await testApiKey(v);
+    if (!ok) { msg.style.color = 'var(--danger)'; msg.textContent = t('apikey.test_fail'); return; }
+    saveKey(v);
+    msg.style.color = 'var(--success)'; msg.textContent = t('apikey.test_ok');
+    setTimeout(() => { host.innerHTML = ''; renderActiveTab(); }, 600);
+  };
+  if (initial) document.getElementById('key-skip').onclick = () => { host.innerHTML = ''; renderActiveTab(); };
+}
+
+// ============ Roleplay ============
+function renderRoleplay() {
+  const c = document.getElementById('content');
+  if (!STATE.scenario) {
+    const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
+    c.innerHTML = `${noKey}<div class="notice">${t('roleplay.intro')}</div><div class="scenario-grid">${SCENARIOS.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
+    c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.conversation = [{ role: 'customer', text: tx(STATE.scenario.open_en, STATE.scenario.open_zh) }]; renderRoleplay(); }; });
+    return;
+  }
+  const s = STATE.scenario;
+  const renderMsg = (m, i) => {
+    const bubble = `<div class="bubble ${m.role}"><div class="bubble-label">${m.role === 'customer' ? (STATE.lang === 'zh' ? '客户' : 'Customer') : (STATE.lang === 'zh' ? '你' : 'You')}</div>${escapeHtml(m.text)}</div>`;
+    if (m.role !== 'staff') return bubble;
+    let hintHtml = '';
+    if (m.hintLoading) {
+      hintHtml = `<div class="hint-loading">${t('hint.loading')}</div>`;
+    } else if (m.hintShown && m.hintText) {
+      hintHtml = `<button class="hint-btn" data-hint-idx="${i}">💡 ${t('hint.hide')}</button><div class="hint-card"><div class="hint-card-label">${t('hint.label')}</div>${escapeHtml(m.hintText)}</div>`;
+    } else {
+      hintHtml = `<button class="hint-btn" data-hint-idx="${i}">💡 ${t('hint.show')}</button>`;
+    }
+    return bubble + hintHtml;
+  };
+  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div><textarea class="textarea" id="reply" placeholder="${t('reply.placeholder')}"></textarea><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button><button class="btn btn-secondary" id="grade" style="flex:1.2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.end_score')}</button></div><div id="grade-out"></div>`;
+  document.getElementById('back').onclick = () => { STATE.scenario = null; STATE.conversation = []; renderRoleplay(); };
+  document.getElementById('send').onclick = onSendReply;
+  document.getElementById('grade').onclick = onGradeRoleplay;
+  document.querySelectorAll('[data-hint-idx]').forEach(btn => {
+    btn.onclick = () => onHintClick(parseInt(btn.getAttribute('data-hint-idx'), 10));
+  });
+  setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50);
+}
+
+async function onHintClick(idx) {
+  const msg = STATE.conversation[idx];
+  if (!msg || msg.role !== 'staff') return;
+  if (msg.hintLoading) return;
+  // Toggle if already loaded
+  if (msg.hintText) {
+    msg.hintShown = !msg.hintShown;
+    renderRoleplay();
+    return;
+  }
+  // Need to fetch
+  msg.hintLoading = true;
+  renderRoleplay();
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const prevCustomer = idx > 0 ? STATE.conversation[idx - 1] : null;
+  const userMsg = `[COACH_HINT] Coach this single moment in the roleplay.
+
+Scenario: ${STATE.scenario.title_en}. Customer profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}.
+
+${prevCustomer ? `Customer just said: "${prevCustomer.text}"` : ''}
+Sales replied: "${msg.text}"
+
+In ${langName}, give a short coach hint in EXACTLY this 3-line format. No extra prose. No JSON. No headings.
+
+Line 1 (Diagnose): one sentence on what was weak or strong about the sales reply
+Line 2 (4D Card): name a specific card from the 4D library to use here (e.g. "Use Root Card 2 - Fear of No Results" or "Use Elite Reframe 3")
+Line 3 (Better line): one example line the salesperson could say instead, in ${langName}, in quotes.
+
+Total under 80 words.`;
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: userMsg }], 400); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); msg.hintLoading = false; renderRoleplay(); return; }
+    raw = '';
+  }
+  msg.hintLoading = false;
+  msg.hintText = (raw || '').trim() || t('hint.fail');
+  msg.hintShown = true;
+  renderRoleplay();
+}
+
+async function onSendReply() {
+  if (STATE.busy) return;
+  const ta = document.getElementById('reply');
+  const text = (ta.value || '').trim();
+  if (!text) return;
+  STATE.conversation.push({ role: 'staff', text });
+  STATE.busy = true;
+  renderRoleplay();
+  const c = document.getElementById('content');
+  c.insertAdjacentHTML('beforeend', `<div class="loading" id="lo">${t('customer.thinking')}</div>`);
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const scenarioBrief = `[ROLEPLAY] You are the customer in this scenario. Title: ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}. Reply in ${langName}. Stay in character. 1-3 sentences.`;
+  const messages = [{ role: 'user', content: scenarioBrief }];
+  STATE.conversation.forEach((m, i) => {
+    if (i === 0 && m.role === 'customer') {
+      messages.push({ role: 'assistant', content: m.text });
+    } else if (m.role === 'staff') {
+      messages.push({ role: 'user', content: m.text });
+    } else {
+      messages.push({ role: 'assistant', content: m.text });
+    }
+  });
+  let reply = '';
+  try { reply = await callClaude(messages, 300); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); STATE.busy = false; renderRoleplay(); return; }
+    reply = '';
+    STATE.lastRaw = e.message;
+  }
+  reply = (reply || '').trim().replace(/^(Customer|客户|Sales|销售|Consultant)[:：\s]*/i, '');
+  if (!reply) reply = STATE.lang === 'zh' ? '(系统繁忙 请重试)' : '(System busy, please retry)';
+  STATE.conversation.push({ role: 'customer', text: reply });
+  STATE.busy = false;
+  renderRoleplay();
+}
+
+async function onGradeRoleplay() {
+  if (STATE.busy) return;
+  STATE.busy = true;
+  const out = document.getElementById('grade-out');
+  out.innerHTML = `<div class="loading">${t('grading')}</div>`;
+  const transcript = STATE.conversation.map(m => `${m.role === 'customer' ? 'CUSTOMER' : 'SALES'}: ${m.text}`).join('\n');
+  const result = await gradeAi(transcript, STATE.scenario);
+  STATE.busy = false;
+  if (!result.parsed) { showGradeError(out, result.raw); return; }
+  const total = (result.parsed.profile || 0) + (result.parsed.root || 0) + (result.parsed.reframe || 0) + (result.parsed.close_dim || 0) + (result.parsed.authority || 0);
+  saveSession({ type: 'chat', scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh), score: total, breakdown: result.parsed, transcript });
+  renderScoreCard(out, result.parsed, total);
+}
+
+async function gradeAi(transcript, scenario) {
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const userMsg = `[GRADE] Score the SALES side of this conversation against the 4D rubric. Output ONLY valid JSON, no prose, no code fences.
+
+Scenario: ${scenario.title_en}. Customer profile: ${scenario.profile_en}. Concern: ${scenario.concern_en}.
+
+TRANSCRIPT:
+${transcript}
+
+Feedback in ${langName}. Output exactly 3 feedback points. Each point under 50 words. Each point must cite a specific moment from the transcript and name the 4D card the salesperson should have used.`;
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: userMsg }], 1500); }
+  catch (e) {
+    if (e.message === 'NO_KEY') showApiKeyModal(false);
+    raw = e.message;
+  }
+  STATE.lastRaw = raw || '(empty response)';
+  return { parsed: parseGradeJson(raw), raw };
+}
+
+function showGradeError(out, raw) {
+  out.innerHTML = `<div class="error-box"><div>${t('grade.fail')}</div><details style="margin-top:6px;"><summary style="cursor:pointer;">${t('grade.show_raw')}</summary><pre>${escapeHtml(raw || '(empty)')}</pre></details></div><div style="height:8px;"></div><button class="btn btn-secondary" id="retry">${t('try.again')}</button>`;
+  document.getElementById('retry').onclick = () => { if (STATE.tab === 'roleplay') onGradeRoleplay(); else if (STATE.tab === 'voice') onGradeVoice(); };
+}
+
+function renderScoreCard(container, r, total) {
+  const dim = (id, name) => { const v = r[id] || 0; const pct = (v / 2) * 100; return `<div class="score-row"><span>${name}</span><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div><span style="font-weight:600;">${v}/2</span></div>`; };
+  const fb = (r.feedback || []);
+  const fbHtml = fb.length ? fb.map(f => `<div class="feedback-item">${escapeHtml(f)}</div>`).join('') : `<div class="feedback-item">${t('fb.placeholder1')}</div>`;
+  container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/10</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div></div>`;
+}
+
+// ============ Voice ============
+function renderVoice() {
+  const c = document.getElementById('content');
+  if (!STATE.scenario) {
+    const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
+    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div><div class="scenario-grid">${SCENARIOS.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('customer.opens')}: ${tx(s.open_en, s.open_zh)}</div></button>`).join('')}</div>`;
+    c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.voiceTranscript = ''; renderVoice(); }; });
+    return;
+  }
+  const s = STATE.scenario;
+  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${t('customer.opens')}</div><div class="card-body">${tx(s.open_en, s.open_zh)}</div></div><div style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;">${t('live.transcript')}</div><div class="transcript" id="transcript">${escapeHtml(STATE.voiceTranscript) || `<span style="color:var(--text-secondary);">${t('transcript.placeholder')}</span>`}</div><button class="btn" id="recbtn">${STATE.recording ? `<span class="recording-pulse"></span>${t('btn.stop_record')}` : t('btn.start_record')}</button><div style="height:8px;"></div><button class="btn btn-secondary" id="gradevoice" ${STATE.voiceTranscript && !STATE.busy ? '' : 'disabled'}>${t('btn.submit_grade')}</button><div id="grade-out"></div>`;
+  document.getElementById('back').onclick = () => { stopRecognition(); STATE.scenario = null; STATE.voiceTranscript = ''; STATE.recording = false; renderVoice(); };
+  document.getElementById('recbtn').onclick = toggleRecord;
+  document.getElementById('gradevoice').onclick = onGradeVoice;
+}
+
+function stopRecognition() { if (STATE.recognition) { try { STATE.recognition.stop(); } catch (e) {} STATE.recognition = null; } STATE.recording = false; }
+
+function toggleRecord() {
+  if (STATE.recording) { stopRecognition(); renderVoice(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert(STATE.lang === 'zh' ? '当前浏览器不支持语音识别' : 'Speech recognition not supported in this browser'); return; }
+  const rec = new SR();
+  rec.lang = STATE.lang === 'zh' ? 'zh-CN' : 'en-US';
+  rec.continuous = true; rec.interimResults = true;
+  let finalText = STATE.voiceTranscript || '';
+  rec.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+    }
+    STATE.voiceTranscript = finalText;
+    const tEl = document.getElementById('transcript');
+    if (tEl) tEl.textContent = finalText + (interim ? ' ' + interim : '');
+  };
+  rec.onerror = (e) => { if (e.error === 'not-allowed') alert(STATE.lang === 'zh' ? '麦克风权限被拒绝' : 'Microphone permission denied'); };
+  rec.onend = () => { STATE.recording = false; STATE.recognition = null; if (STATE.tab === 'voice' && STATE.scenario) renderVoice(); };
+  try { rec.start(); STATE.recognition = rec; STATE.recording = true; renderVoice(); }
+  catch (e) { alert('Start record failed ' + (e.message || '')); }
+}
+
+async function onGradeVoice() {
+  if (STATE.busy || !STATE.voiceTranscript) return;
+  STATE.busy = true;
+  const out = document.getElementById('grade-out');
+  out.innerHTML = `<div class="loading">${t('grading')}</div>`;
+  const transcript = `CUSTOMER: ${STATE.scenario.open_en}\nSALES: ${STATE.voiceTranscript}`;
+  const result = await gradeAi(transcript, STATE.scenario);
+  STATE.busy = false;
+  if (!result.parsed) { showGradeError(out, result.raw); return; }
+  const total = (result.parsed.profile || 0) + (result.parsed.root || 0) + (result.parsed.reframe || 0) + (result.parsed.close_dim || 0) + (result.parsed.authority || 0);
+  saveSession({ type: 'voice', scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh), score: total, breakdown: result.parsed, transcript: STATE.voiceTranscript });
+  renderScoreCard(out, result.parsed, total);
+}
+
+// ============ Knowledge ============
+function renderKnowledge() {
+  const c = document.getElementById('content');
+  c.innerHTML = `<input class="search-input" id="ksearch" placeholder="${t('kb.search')}" value="${escapeHtml(STATE.knowledgeSearch)}"><div class="toggle-row"><button class="toggle-btn ${STATE.knowledgeView === '4d' ? 'active' : ''}" data-view="4d">${t('kb.4d')}</button><button class="toggle-btn ${STATE.knowledgeView === '6r' ? 'active' : ''}" data-view="6r">${t('kb.6r')}</button><button class="toggle-btn ${STATE.knowledgeView === 'persona' ? 'active' : ''}" data-view="persona">${t('kb.persona')}</button></div><div id="cat-bar"></div><div id="klist"></div>`;
+  document.getElementById('ksearch').oninput = (e) => { STATE.knowledgeSearch = e.target.value; renderKList(); };
+  c.querySelectorAll('.toggle-btn').forEach(b => { b.onclick = () => { STATE.knowledgeView = b.getAttribute('data-view'); if (STATE.knowledgeView === '4d') STATE.knowledgeCat = 'frame'; else if (STATE.knowledgeView === 'persona') STATE.knowledgeCat = 'l1'; renderKnowledge(); }; });
+  renderCatBar();
+  renderKList();
+}
+
+function renderCatBar() {
+  const bar = document.getElementById('cat-bar');
+  if (!bar) return;
+  let cats = [];
+  if (STATE.knowledgeView === '4d') cats = [{ id: 'frame', label: t('cat.frame') }, { id: 'value', label: t('cat.value') }, { id: 'root', label: t('cat.root') }, { id: 'close', label: t('cat.close') }, { id: 'elite', label: t('cat.elite') }, { id: 'joker', label: t('cat.joker') }];
+  else if (STATE.knowledgeView === 'persona') cats = [{ id: 'l1', label: t('cat.l1') }, { id: 'l2', label: t('cat.l2') }, { id: 'l3', label: t('cat.l3') }];
+  if (cats.length === 0) { bar.innerHTML = ''; return; }
+  bar.innerHTML = `<div class="cat-row">${cats.map(c => `<button class="cat-chip ${STATE.knowledgeCat === c.id ? 'active' : ''}" data-cat="${c.id}">${c.label}</button>`).join('')}</div>`;
+  bar.querySelectorAll('.cat-chip').forEach(b => { b.onclick = () => { STATE.knowledgeCat = b.getAttribute('data-cat'); renderKnowledge(); }; });
+}
+
+function renderKList() {
+  const list = document.getElementById('klist');
+  if (!list) return;
+  const q = (STATE.knowledgeSearch || '').toLowerCase().trim();
+  const matches = (...fields) => !q || fields.some(f => (f || '').toString().toLowerCase().includes(q));
+  if (STATE.knowledgeView === '4d') {
+    const items = ALL_4D.filter(c => c.cat === STATE.knowledgeCat && matches(c.name_en, c.name_zh, c.when_en, c.when_zh, c.body_en, c.body_zh));
+    list.innerHTML = items.length ? items.map(c => `<div class="card"><div class="card-title">${tx(c.name_en, c.name_zh)}</div>${c.lvl ? `<div class="card-meta">L${c.lvl}</div>` : ''}<div class="kv-row"><span class="tag">${t('when.use')}</span>${tx(c.when_en, c.when_zh)}</div>${c.detect_en ? `<div class="kv-row"><span class="tag">${t('detection')}</span>${tx(c.detect_en, c.detect_zh)}</div>` : ''}<div class="kv-row"><span class="tag">${t('script.example')}</span>${tx(c.body_en, c.body_zh)}</div>${c.risk_en ? `<div class="kv-row"><span class="tag dim">${t('risk.note')}</span>${tx(c.risk_en, c.risk_zh)}</div>` : ''}</div>`).join('') : `<div class="empty">${t('no.match')}</div>`;
+  } else if (STATE.knowledgeView === '6r') {
+    const items = SIX_R.filter(s => matches(s.en_name, s.zh_name, s.phase_en, s.phase_zh, s.mean_en, s.mean_zh));
+    list.innerHTML = items.length ? items.map(s => `<div class="card"><div class="card-title">${s.en_name} <span style="color:var(--text-secondary); font-size:13px; font-weight:normal;">${s.zh_name}</span></div><div class="kv-row"><span class="tag">${t('phase')}</span>${tx(s.phase_en, s.phase_zh)}</div><div class="kv-row"><span class="tag">${t('feeling')}</span>${tx(s.feel_en, s.feel_zh)}</div><div class="kv-row"><span class="tag">${t('meaning')}</span>${tx(s.mean_en, s.mean_zh)}</div><div class="kv-row"><span class="tag dim">${t('why')}</span>${tx(s.why_en, s.why_zh)}</div></div>`).join('') : `<div class="empty">${t('no.match')}</div>`;
+  } else if (STATE.knowledgeView === 'persona') {
+    if (STATE.knowledgeCat === 'l1') {
+      const items = L1_PERSONAS.filter(p => matches(p.name_en, p.name_zh, p.obj_en, p.obj_zh, p.sol_en, p.sol_zh));
+      list.innerHTML = items.length ? items.map(p => `<div class="card"><div class="card-title"><span class="level-pill level-1">P${p.n}</span>${tx(p.name_en, p.name_zh)}</div><div class="persona-row"><div><strong>${STATE.lang === 'zh' ? '倾向' : 'Tendency'}</strong>${p.tend}</div><div><strong>${STATE.lang === 'zh' ? '预算' : 'Budget'}</strong>${p.budget}</div><div><strong>${STATE.lang === 'zh' ? '主要异议' : 'Main objection'}</strong>${tx(p.obj_en, p.obj_zh)}</div><div><strong>${STATE.lang === 'zh' ? '关键词' : 'Solution keywords'}</strong>${tx(p.sol_en, p.sol_zh)}</div></div></div>`).join('') : `<div class="empty">${t('no.match')}</div>`;
+    } else if (STATE.knowledgeCat === 'l2') {
+      const items = L2_ROOT.filter(p => matches(p.t_en, p.t_zh, p.d_en, p.d_zh, p.cue_en, p.cue_zh));
+      list.innerHTML = items.length ? items.map(p => `<div class="card"><div class="card-title"><span class="level-pill level-2">L2-${p.n}</span>${tx(p.t_en, p.t_zh)}</div><div class="kv-row"><span class="tag">${STATE.lang === 'zh' ? '心理' : 'Psychology'}</span>${tx(p.d_en, p.d_zh)}</div><div class="kv-row"><span class="tag dim">${t('detection')}</span>${tx(p.cue_en, p.cue_zh)}</div></div>`).join('') : `<div class="empty">${t('no.match')}</div>`;
+    } else if (STATE.knowledgeCat === 'l3') {
+      const items = L3_EMO.filter(p => matches(p.t_en, p.t_zh, p.frame_en, p.frame_zh, p.script_en, p.script_zh));
+      list.innerHTML = items.length ? items.map(p => `<div class="card"><div class="card-title"><span class="level-pill level-3">L3-${p.n}</span>${tx(p.t_en, p.t_zh)}</div><div class="kv-row"><span class="tag">${STATE.lang === 'zh' ? '主框架' : 'Primary frame'}</span>${tx(p.frame_en, p.frame_zh)}</div><div class="kv-row"><span class="tag">${t('script.example')}</span>${tx(p.script_en, p.script_zh)}</div></div>`).join('') : `<div class="empty">${t('no.match')}</div>`;
+    }
+  }
+}
+
+// ============ Dashboard ============
+function renderDashboard() {
+  const c = document.getElementById('content');
+  const sessions = loadSessions();
+  const total = sessions.length;
+  const avg = total ? (sessions.reduce((a, s) => a + (s.score || 0), 0) / total).toFixed(1) : '—';
+  const last7 = sessions.filter(s => Date.now() - s.ts < 7 * 24 * 3600 * 1000).length;
+  let weakest = '—';
+  if (total > 0) {
+    const sums = { profile: 0, root: 0, reframe: 0, close_dim: 0, authority: 0 };
+    sessions.forEach(s => { const b = s.breakdown || {}; Object.keys(sums).forEach(k => sums[k] += (b[k] || 0)); });
+    let min = Infinity, minKey = null;
+    Object.keys(sums).forEach(k => { if (sums[k] < min) { min = sums[k]; minKey = k; } });
+    const map = { profile: t('rubric.profile'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), authority: t('rubric.authority') };
+    weakest = map[minKey] || '—';
+  }
+  const recent = sessions.slice(0, 10);
+  c.innerHTML = `<div class="stat-row"><div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">${t('stat.total')}</div></div><div class="stat-card"><div class="stat-num">${avg}</div><div class="stat-label">${t('stat.avg')}</div></div><div class="stat-card"><div class="stat-num">${last7}</div><div class="stat-label">${t('stat.last7')}</div></div></div><div class="card"><div class="card-title">${t('weakest.dim')}</div><div class="card-body" style="margin-top:6px;">${weakest}</div><div class="card-meta" style="margin-top:6px;">${t('coach.action')}</div></div><div class="section-title">${t('recent.drills')}</div>${recent.length === 0 ? `<div class="empty">${t('no.records')}</div>` : recent.map(s => `<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><div style="flex:1; min-width:0;"><div class="card-title">${escapeHtml(s.scenario)}</div><div class="card-meta">${s.type === 'voice' ? t('voice.text') : t('chat.text')} · ${formatTs(s.ts)}</div></div><div style="font-size:20px; font-weight:600; color:var(--accent);">${s.score}/10</div></div></div>`).join('')}<div style="height:14px;"></div><button class="btn btn-secondary" id="clear">${t('clear.records')}</button><div style="font-size:11px; color:var(--text-secondary); margin-top:10px; text-align:center;">${t('data.note')}</div>`;
+  document.getElementById('clear').onclick = () => { if (confirm(t('clear.confirm'))) { localStorage.removeItem(SK.sessions); renderDashboard(); } };
+}
+
+// ============ Settings ============
+function renderSettings() {
+  const c = document.getElementById('content');
+  const k = loadKey();
+  const tail = k ? k.slice(-4) : '';
+  const status = k ? t('settings.key_status_set').replace('{tail}', tail) : t('settings.key_status_unset');
+  c.innerHTML = `<div class="card"><div class="card-title">${t('settings.apikey')}</div><div class="card-meta" style="margin-top:6px; ${k ? 'color: var(--success);' : 'color: var(--danger);'}">${status}</div><div style="height:10px;"></div><button class="btn" id="upd">${t('settings.update_key')}</button>${k ? `<div style="height:8px;"></div><button class="btn btn-danger" id="clr">${t('settings.clear_key')}</button>` : ''}</div><div class="card"><div class="card-title">${t('settings.about')}</div><div class="card-body" style="margin-top:6px;">${t('settings.about_body')}</div><div class="card-meta" style="margin-top:8px;">${t('settings.cost_note')}</div></div>`;
+  document.getElementById('upd').onclick = () => showApiKeyModal(false);
+  if (k) document.getElementById('clr').onclick = () => { if (confirm(t('settings.clear_confirm'))) { clearKey(); renderSettings(); } };
+}
+
+function formatTs(ts) {
+  const d = new Date(ts);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return t('just.now');
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' ' + t('mins.ago');
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' ' + t('hours.ago');
+  return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+}
+
+// ============ Tab routing ============
+function renderActiveTab() {
+  if (STATE.tab === 'roleplay') renderRoleplay();
+  else if (STATE.tab === 'voice') renderVoice();
+  else if (STATE.tab === 'knowledge') renderKnowledge();
+  else if (STATE.tab === 'dashboard') renderDashboard();
+  else if (STATE.tab === 'settings') renderSettings();
+}
+
+function setTab(tab) {
+  stopRecognition();
+  STATE.tab = tab;
+  STATE.scenario = null; STATE.conversation = []; STATE.voiceTranscript = ''; STATE.busy = false;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
+  applyHeaderTitle();
+  renderActiveTab();
+  window.scrollTo(0, 0);
+}
+
+function applyHeaderTitle() {
+  const map = { roleplay: 'header.roleplay', voice: 'header.voice', knowledge: 'header.knowledge', dashboard: 'header.dashboard', settings: 'header.settings' };
+  const v = I18N[STATE.lang][map[STATE.tab]];
+  document.getElementById('page-title').textContent = v[0];
+  document.getElementById('page-sub').textContent = v[1];
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.documentElement.lang = STATE.lang === 'zh' ? 'zh-CN' : 'en';
+}
+
+function setLang(l) {
+  STATE.lang = l; saveLang(l);
+  document.getElementById('lang-en').classList.toggle('active', l === 'en');
+  document.getElementById('lang-zh').classList.toggle('active', l === 'zh');
+  applyHeaderTitle();
+  setTab(STATE.tab);
+}
+
+// ============ Init ============
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => setTab(b.getAttribute('data-tab')));
+document.getElementById('lang-en').onclick = () => setLang('en');
+document.getElementById('lang-zh').onclick = () => setLang('zh');
+
+STATE.lang = loadLang();
+document.getElementById('lang-en').classList.toggle('active', STATE.lang === 'en');
+document.getElementById('lang-zh').classList.toggle('active', STATE.lang === 'zh');
+setTab('roleplay');
+
+// First run: prompt for API key
+if (!loadKey()) setTimeout(() => showApiKeyModal(true), 300);
+</script>
+</body>
+</html>

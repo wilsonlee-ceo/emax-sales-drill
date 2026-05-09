@@ -244,7 +244,9 @@ const I18N = {
     'mic.start': '🎤 Voice',
     'mic.stop': 'Stop',
     'mic.unsupported': 'Speech recognition not supported. Use Chrome or Safari.',
-    'mic.denied': 'Microphone permission denied'
+    'mic.denied': 'Microphone permission denied',
+    'continue.chat': 'Continue this conversation',
+    'continue.note': 'Resumes from where you left off. New grade will save as a separate record.'
   },
   zh: {
     'header.roleplay':  ['角色扮演', '练到反射 才算会'],
@@ -329,7 +331,9 @@ const I18N = {
     'mic.start': '🎤 录音',
     'mic.stop': '停止',
     'mic.unsupported': '当前浏览器不支持语音识别 请用 Chrome 或 Safari',
-    'mic.denied': '麦克风权限被拒绝'
+    'mic.denied': '麦克风权限被拒绝',
+    'continue.chat': '继续这段对话',
+    'continue.note': '从你停下的地方继续 新的评分会生成一条新记录 不影响原来的'
   }
 };
 
@@ -1476,6 +1480,7 @@ function renderSessionDetail() {
   const c = document.getElementById('content');
   if (!s) { renderDashboard(); return; }
   const max = s.breakdown ? maxScore(s.breakdown) : 10;
+  const canContinue = s.type === 'chat' && s.conversation && Array.isArray(s.conversation) && s.scenarioId && SCENARIOS.find(sc => sc.id === s.scenarioId);
   c.innerHTML = `
     <button class="back-btn" id="back">← ${t('back.dashboard')}</button>
     <div class="card">
@@ -1486,6 +1491,7 @@ function renderSessionDetail() {
     <div id="conv-area"></div>
     <div class="section-title">${t('feedback.title')}</div>
     <div id="grade-area"></div>
+    ${canContinue ? `<div style="margin-top:18px;"><button class="btn" id="continue-btn">▶ ${t('continue.chat')}</button><div style="font-size:11px; color:var(--text-secondary); margin-top:8px; text-align:center; line-height:1.5;">${t('continue.note')}</div></div>` : ''}
   `;
   const convArea = document.getElementById('conv-area');
   if (s.conversation && Array.isArray(s.conversation)) {
@@ -1506,6 +1512,25 @@ function renderSessionDetail() {
     gradeArea.innerHTML = `<div class="empty">${t('no.conv')}</div>`;
   }
   document.getElementById('back').onclick = () => { STATE.viewingSession = null; renderDashboard(); };
+  if (canContinue) {
+    document.getElementById('continue-btn').onclick = () => onContinueChat(s);
+  }
+}
+
+function onContinueChat(session) {
+  const scenario = SCENARIOS.find(sc => sc.id === session.scenarioId);
+  if (!scenario) return;
+  // Deep copy conversation so we do not mutate the saved session
+  STATE.scenario = scenario;
+  STATE.conversation = JSON.parse(JSON.stringify(session.conversation || []));
+  STATE.viewingSession = null;
+  STATE.currentGrade = null;
+  STATE.busy = false;
+  STATE.tab = 'roleplay';
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'roleplay'));
+  applyHeaderTitle();
+  renderRoleplay();
+  setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
 }
 
 // ============ Settings ============

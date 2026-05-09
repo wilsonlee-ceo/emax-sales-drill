@@ -91,14 +91,18 @@ html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFa
 .feedback-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 12px; margin-bottom: 8px; font-size: 13px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; line-height: 1.5; }
 .dim-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px; margin-right: 6px; font-weight: 600; letter-spacing: 0.2px; vertical-align: middle; }
 .dim-badge.dim-profile { background: #e3f0fa; color: #1d5a8e; }
+.dim-badge.dim-frame { background: #d6eef1; color: #147984; }
 .dim-badge.dim-root { background: #fff4e0; color: #c95f1e; }
 .dim-badge.dim-reframe { background: #f0e6f9; color: #6b2c91; }
 .dim-badge.dim-close_dim { background: #e3f3e7; color: #2d7a4d; }
+.dim-badge.dim-compliance { background: #e1e7ed; color: #2c3e50; }
 .dim-badge.dim-authority { background: #fde8e6; color: #c0392b; }
 .feedback-item.cat-profile { border-left-color: #1d5a8e; }
+.feedback-item.cat-frame { border-left-color: #147984; }
 .feedback-item.cat-root { border-left-color: #c95f1e; }
 .feedback-item.cat-reframe { border-left-color: #6b2c91; }
 .feedback-item.cat-close_dim { border-left-color: #2d7a4d; }
+.feedback-item.cat-compliance { border-left-color: #2c3e50; }
 .feedback-item.cat-authority { border-left-color: #c0392b; }
 .notice { background: var(--accent-bg); border: 1px solid #f0e1c8; color: #6b4423; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
 .error-box { background: #fde8e6; border: 1px solid #f5b9b3; color: #8a2920; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 12px; line-height: 1.5; }
@@ -115,6 +119,11 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 .hint-card { align-self: flex-end; max-width: 82%; background: #f0f7e8; border: 1px solid #d4e4c0; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; line-height: 1.55; color: #3a5024; margin-top: 2px; white-space: pre-wrap; }
 .hint-card-label { font-size: 10px; font-weight: 600; color: #5a7a3a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 .hint-loading { align-self: flex-end; font-size: 11px; color: var(--text-secondary); padding: 6px 10px; }
+.say-more-btn { margin-top: 10px; background: none; border: 1px dashed var(--border); padding: 5px 12px; border-radius: 12px; font-size: 11px; color: var(--text-secondary); cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; }
+.say-more-btn:active { background: var(--bg); }
+.say-more-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.expanded-feedback { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; line-height: 1.65; color: #4a4a4a; white-space: pre-wrap; }
+.expanded-feedback-loading { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-secondary); text-align: center; }
 .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .modal { background: var(--surface); border-radius: var(--radius); padding: 20px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
 .modal h2 { font-size: 17px; margin-bottom: 8px; }
@@ -183,7 +192,7 @@ const I18N = {
     'when.use': 'When to use', 'script.example': 'Script', 'risk.note': 'Watch out',
     'detection': 'Detection cues', 'reframe': 'Reframe', 'avoid': 'Avoid',
     'phase': 'Phase', 'feeling': 'Feeling', 'meaning': 'What it means', 'why': 'Why it matters',
-    'rubric.profile': 'Profile', 'rubric.root': 'Root cause', 'rubric.reframe': 'Reframe', 'rubric.close': 'Close', 'rubric.authority': 'Authority',
+    'rubric.profile': 'Profile', 'rubric.frame': 'Frame', 'rubric.root': 'Root cause', 'rubric.reframe': 'Reframe', 'rubric.close': 'Close', 'rubric.compliance': 'Compliance', 'rubric.authority': 'Authority',
     'total.score': 'Total', 'recorded': 'Drill recorded', 'feedback.title': 'Specific improvements',
     'no.match': 'No matching cards', 'fb.placeholder1': 'No specific feedback returned',
     'apikey.title': 'Set up your Anthropic API key',
@@ -213,7 +222,16 @@ const I18N = {
     'hint.fail': 'Hint failed. Try again.',
     'lvl.l1': 'L1 Standard (12)',
     'lvl.l2': 'L2 Root (6)',
-    'lvl.l3': 'L3 Emotional (8)'
+    'lvl.l3': 'L3 Emotional (8)',
+    'back.dashboard': 'Back to coach',
+    'session.detail': 'Drill review',
+    'conversation.label': 'Full conversation',
+    'transcript.label': 'Transcript',
+    'no.conv': 'No conversation data saved for this drill',
+    'say.more': 'AI say more',
+    'say.less': 'Show less',
+    'expanding': 'Going deeper...',
+    'expand.fail': 'Could not load deeper analysis'
   },
   zh: {
     'header.roleplay':  ['角色扮演', '练到反射 才算会'],
@@ -248,7 +266,7 @@ const I18N = {
     'when.use': '何时用', 'script.example': '话术示例', 'risk.note': '注意',
     'detection': '识别信号', 'reframe': '重新定义', 'avoid': '避免',
     'phase': '阶段', 'feeling': '感受', 'meaning': '代表意义', 'why': '重要原因',
-    'rubric.profile': '客户画像', 'rubric.root': '根本原因', 'rubric.reframe': '重新定义', 'rubric.close': '安全成交', 'rubric.authority': '权威感',
+    'rubric.profile': '客户画像', 'rubric.frame': '框架', 'rubric.root': '根本原因', 'rubric.reframe': '重新定义', 'rubric.close': '安全成交', 'rubric.compliance': '合规与升级', 'rubric.authority': '权威感',
     'total.score': '总分', 'recorded': '演练已记录', 'feedback.title': '改进建议',
     'no.match': '没有匹配的卡', 'fb.placeholder1': '没有具体反馈',
     'apikey.title': '设置 Anthropic API 密钥',
@@ -278,7 +296,16 @@ const I18N = {
     'hint.fail': '提示生成失败 请重试',
     'lvl.l1': 'L1 标准 (12)',
     'lvl.l2': 'L2 根源 (6)',
-    'lvl.l3': 'L3 情绪 (8)'
+    'lvl.l3': 'L3 情绪 (8)',
+    'back.dashboard': '返回看板',
+    'session.detail': '演练回顾',
+    'conversation.label': '完整对话',
+    'transcript.label': '语音记录',
+    'no.conv': '本次演练没有保存对话数据',
+    'say.more': 'AI 说更多',
+    'say.less': '收起',
+    'expanding': '深度分析中...',
+    'expand.fail': '深度分析加载失败'
   }
 };
 
@@ -426,13 +453,15 @@ const L3_EMO = [
 const STATE = {
   lang: 'en', tab: 'roleplay', scenario: null, conversation: [], voiceTranscript: '',
   recording: false, recognition: null, knowledgeView: '4d', knowledgeCat: 'frame',
-  knowledgeSearch: '', busy: false, lastRaw: '', pendingReplyText: '', scenarioLevel: 1
+  knowledgeSearch: '', busy: false, lastRaw: '', pendingReplyText: '', scenarioLevel: 1,
+  viewingSession: null, currentGrade: null
 };
 
 // ============ Storage ============
 const SK = { sessions: 'emax_sessions_v3', lang: 'emax_lang_v3', apiKey: 'emax_anthropic_key_v3' };
 function loadSessions() { try { return JSON.parse(localStorage.getItem(SK.sessions) || '[]'); } catch (e) { return []; } }
-function saveSession(s) { const all = loadSessions(); all.unshift({ ...s, ts: Date.now() }); localStorage.setItem(SK.sessions, JSON.stringify(all.slice(0, 100))); }
+function saveSession(s) { const all = loadSessions(); all.unshift({ ...s, ts: s.ts || Date.now() }); localStorage.setItem(SK.sessions, JSON.stringify(all.slice(0, 100))); }
+function updateSession(ts, updates) { const all = loadSessions(); const i = all.findIndex(s => s.ts === ts); if (i >= 0) { all[i] = { ...all[i], ...updates }; localStorage.setItem(SK.sessions, JSON.stringify(all)); } }
 function loadLang() { return localStorage.getItem(SK.lang) || 'en'; }
 function saveLang(l) { localStorage.setItem(SK.lang, l); }
 function loadKey() { return localStorage.getItem(SK.apiKey) || ''; }
@@ -565,17 +594,18 @@ MODE A - CUSTOMER ROLEPLAY:
 When the user message starts with [ROLEPLAY] or asks you to play a customer, stay in character. Reply naturally, 1-3 sentences. Push back authentically. Do not break character. Do not give advice. Do not explain you are AI. Use the language requested. Do not prefix your reply with "Customer:" or anything similar.
 
 MODE B - SALES COACH GRADER:
-When the user message starts with [GRADE] or asks for grading, score the SALES side of the transcript on 5 dimensions, each 0, 1, or 2:
+When the user message starts with [GRADE] or asks for grading, score the SALES side of the transcript on 6 dimensions, each 0, 1, or 2:
 - profile: identified the customer type and real need (matched to one of the 26 personas)
+- frame: set the right framing approach for this customer type. Did they use one of the 6 FRAME cards (Authoritative, Pain Uncovering + Future Painting, Value Anchoring + ROI, Strong Technical Explanation, Competitive Framing, Empowerment Framing)? Or did they skip framing entirely?
 - root: uncovered real fear, not just surface objection
-- reframe: reframed instead of defending or apologizing
+- reframe: reframed instead of defending or apologizing (use ELITE REFRAME SCRIPTS or ROOT card reframes)
 - close_dim: attempted a specific named close from the 4D library (mention which card by name in feedback)
-- authority: held professional frame, no overpromise, escalated to doctor when needed
+- compliance: safe wording (no medical guarantees, no "we promise this result"), escalated to doctor when appropriate, controlled claims and promises. This addresses May Gap #2 (lacks compliance language) and Gap #7 (clinical advisory bridge).
 
-Then write 3 specific improvement points citing exact moments from the conversation.
+Then write 3 specific improvement points using the multi-path teaching format from TEACHING PHILOSOPHY.
 
-CRITICAL: When grading, output ONLY valid JSON. No prose. No code fences. No preamble. No "Here is the grade:" prefix. Format exactly:
-{"profile":N,"root":N,"reframe":N,"close_dim":N,"authority":N,"feedback":["point 1","point 2","point 3"]}`;
+CRITICAL: When grading, output ONLY valid JSON. No prose. No code fences. No preamble. Format exactly:
+{"profile":N,"frame":N,"root":N,"reframe":N,"close_dim":N,"compliance":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}`;
 }
 
 const SYSTEM_PROMPT = buildSystemPrompt();
@@ -693,15 +723,15 @@ function parseGradeJson(s) {
   }
 
   // Fallback: response may be truncated. Extract scores and feedback by regex.
-  const dims = ['profile', 'root', 'reframe', 'close_dim', 'authority'];
+  const dims = ['profile', 'frame', 'root', 'reframe', 'close_dim', 'compliance', 'authority'];
   const scores = {};
   dims.forEach(d => {
     const m = txt.match(new RegExp('"' + d + '"\\s*:\\s*(\\d)'));
     if (m) scores[d] = parseInt(m[1], 10);
   });
   if (Object.keys(scores).length < 3) return null;
-  // Default missing dims to 0
-  dims.forEach(d => { if (scores[d] === undefined) scores[d] = 0; });
+  // Default missing common dims to 0
+  ['profile', 'frame', 'root', 'reframe', 'close_dim', 'compliance'].forEach(d => { if (scores[d] === undefined) scores[d] = 0; });
 
   // Extract feedback items
   const feedback = [];
@@ -885,9 +915,35 @@ async function onGradeRoleplay() {
   const result = await gradeAi(transcript, STATE.scenario);
   STATE.busy = false;
   if (!result.parsed) { showGradeError(out, result.raw); return; }
-  const total = (result.parsed.profile || 0) + (result.parsed.root || 0) + (result.parsed.reframe || 0) + (result.parsed.close_dim || 0) + (result.parsed.authority || 0);
-  saveSession({ type: 'chat', scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh), score: total, breakdown: result.parsed, transcript });
+  const total = computeTotal(result.parsed);
+  const ts = Date.now();
+  const sessionData = {
+    ts,
+    type: 'chat',
+    scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh),
+    scenarioId: STATE.scenario.id,
+    score: total,
+    breakdown: result.parsed,
+    transcript,
+    conversation: STATE.conversation.map(m => ({ role: m.role, text: m.text, hintText: m.hintText || '' }))
+  };
+  saveSession(sessionData);
+  STATE.currentGrade = sessionData;
   renderScoreCard(out, result.parsed, total);
+}
+
+function computeTotal(parsed) {
+  const dims = ['profile', 'frame', 'root', 'reframe', 'close_dim', 'compliance', 'authority'];
+  let total = 0;
+  dims.forEach(d => { if (parsed[d] !== undefined) total += (parsed[d] || 0); });
+  return total;
+}
+
+function maxScore(parsed) {
+  const dims = ['profile', 'frame', 'root', 'reframe', 'close_dim', 'compliance', 'authority'];
+  let count = 0;
+  dims.forEach(d => { if (parsed[d] !== undefined) count++; });
+  return count * 2;
 }
 
 async function gradeAi(transcript, scenario) {
@@ -899,24 +955,26 @@ Scenario: ${scenario.title_en}. Customer profile: ${scenario.profile_en}. Concer
 TRANSCRIPT:
 ${transcript}
 
-Score each dimension 0-2.
+Score each of 6 dimensions 0-2: profile, frame, root, reframe, close_dim, compliance.
 
-Output exactly 3 feedback points. Each feedback is an OBJECT with:
-- "dim": exactly one of "profile" | "root" | "reframe" | "close_dim" | "authority"
-- "text": the coaching point in ${langName}, under 110 words.
+Output exactly 6 feedback points, ONE FOR EACH DIMENSION. Order: profile, frame, root, reframe, close_dim, compliance. Each feedback is an OBJECT with:
+- "dim": the dimension name (must match the order above)
+- "text": the coaching point in ${langName}, under 80 words.
 
 The "text" must follow this teaching format (see TEACHING PHILOSOPHY in your system prompt):
 1. Acknowledge what the salesperson did at a specific moment (cite the moment).
 2. Show 2-3 ALTERNATIVE valid paths they could have taken, using DIFFERENT 4D card combinations. Name the cards explicitly.
-3. End with the underlying principle (e.g. "Any of these works as long as you set the frame first" or "All three follow Frame -> Value -> Close").
-Where relevant, briefly connect the gap to one of the 7 May gaps by number, e.g. "(May Gap #5 - weak fear conversion)".
+3. End with the underlying principle.
+Where relevant, briefly connect to one of the 7 May gaps by number, e.g. "(May Gap #5 - weak fear conversion)".
+
+If a dimension is already strong (score 2), still write a brief feedback acknowledging what they did well and one alternative card they could have used as variation. Keep it under 50 words for strong dimensions.
 
 Do NOT prescribe one right answer. Show options. Teach judgment.
 
 Required JSON format exactly:
-{"profile":N,"root":N,"reframe":N,"close_dim":N,"authority":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}`;
+{"profile":N,"frame":N,"root":N,"reframe":N,"close_dim":N,"compliance":N,"feedback":[{"dim":"profile","text":"..."},{"dim":"frame","text":"..."},{"dim":"root","text":"..."},{"dim":"reframe","text":"..."},{"dim":"close_dim","text":"..."},{"dim":"compliance","text":"..."}]}`;
   let raw = '';
-  try { raw = await callClaude([{ role: 'user', content: userMsg }], 2500); }
+  try { raw = await callClaude([{ role: 'user', content: userMsg }], 3500); }
   catch (e) {
     if (e.message === 'NO_KEY') showApiKeyModal(false);
     raw = e.message;
@@ -931,17 +989,104 @@ function showGradeError(out, raw) {
 }
 
 function renderScoreCard(container, r, total) {
-  const dim = (id, name) => { const v = r[id] || 0; const pct = (v / 2) * 100; return `<div class="score-row"><span>${name}</span><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div><span style="font-weight:600;">${v}/2</span></div>`; };
-  const dimLabels = { profile: t('rubric.profile'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), authority: t('rubric.authority') };
+  const dim = (id, name) => {
+    if (r[id] === undefined) return '';
+    const v = r[id] || 0;
+    const pct = (v / 2) * 100;
+    return `<div class="score-row"><span>${name}</span><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div><span style="font-weight:600;">${v}/2</span></div>`;
+  };
+  const dimLabels = { profile: t('rubric.profile'), frame: t('rubric.frame'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), compliance: t('rubric.compliance'), authority: t('rubric.authority') };
   const fb = (r.feedback || []);
-  const fbHtml = fb.length ? fb.map(f => {
+  const fbHtml = fb.length ? fb.map((f, idx) => {
     if (typeof f === 'string') return `<div class="feedback-item">${escapeHtml(f)}</div>`;
     const d = f.dim || '';
     const label = dimLabels[d] || d;
     const badge = d ? `<span class="dim-badge dim-${escapeHtml(d)}">${label}</span>` : '';
-    return `<div class="feedback-item cat-${escapeHtml(d)}">${badge}${escapeHtml(f.text || f.comment || '')}</div>`;
+    let expansionBlock = '';
+    if (f.expandedLoading) {
+      expansionBlock = `<div class="expanded-feedback-loading">${t('expanding')}</div>`;
+    } else if (f.expanded && f.showExpanded) {
+      expansionBlock = `<div class="expanded-feedback">${escapeHtml(f.expanded)}</div>`;
+    }
+    const btnLabel = f.expanded && f.showExpanded ? t('say.less') : t('say.more');
+    const btnIcon = f.expanded && f.showExpanded ? '▲' : '🔍';
+    const btn = `<button class="say-more-btn" data-fb-idx="${idx}" ${f.expandedLoading ? 'disabled' : ''}>${btnIcon} ${btnLabel}</button>`;
+    return `<div class="feedback-item cat-${escapeHtml(d)}">${badge}${escapeHtml(f.text || f.comment || '')}${expansionBlock}<div>${btn}</div></div>`;
   }).join('') : `<div class="feedback-item">${t('fb.placeholder1')}</div>`;
-  container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/10</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div></div>`;
+  const max = maxScore(r);
+  container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/${max}</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('frame', t('rubric.frame'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('compliance', t('rubric.compliance'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div></div>`;
+  container.querySelectorAll('.say-more-btn').forEach(b => {
+    b.onclick = () => onSayMore(parseInt(b.getAttribute('data-fb-idx'), 10));
+  });
+}
+
+async function onSayMore(idx) {
+  const isViewingSession = !!STATE.viewingSession;
+  const grade = isViewingSession ? STATE.viewingSession : STATE.currentGrade;
+  if (!grade || !grade.breakdown || !grade.breakdown.feedback) return;
+  const fb = grade.breakdown.feedback[idx];
+  if (!fb || typeof fb === 'string') return;
+
+  // Toggle visibility if already expanded
+  if (fb.expanded) {
+    fb.showExpanded = !fb.showExpanded;
+    rerenderActiveGrade();
+    return;
+  }
+
+  // Need to fetch
+  fb.expandedLoading = true;
+  rerenderActiveGrade();
+
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const dimMap = { profile: 'Profile (customer type identification)', frame: 'Frame (which FRAME card from 4D library)', root: 'Root cause (real fear vs surface objection)', reframe: 'Reframe (using ELITE REFRAME or ROOT card)', close_dim: 'Close (named close from 4D library)', compliance: 'Compliance (safe wording, doctor escalation, controlled claims)' };
+  const dimDesc = dimMap[fb.dim] || fb.dim;
+  const transcriptText = grade.transcript || (grade.conversation || []).map(m => (m.role === 'customer' ? 'CUSTOMER: ' : 'SALES: ') + m.text).join('\n');
+
+  const prompt = `[SAY MORE] Expand on a previous feedback with a deeper coaching analysis.
+
+Dimension being expanded: ${dimDesc}
+Your previous short feedback was: "${fb.text}"
+
+CONVERSATION:
+${transcriptText}
+
+Now write 200-300 words in ${langName}. Plain text. No JSON. No headings. No code fences.
+
+Cover in this order, in flowing paragraphs:
+1. Why this moment matters strategically. Connect to one of the 7 May gaps if relevant.
+2. The psychological pattern at play with this customer type. What is she really afraid of or wanting?
+3. 4-5 specific 4D card combinations that could have worked, ranked from safest to most advanced. Name each card explicitly.
+4. The most common mistake in this exact situation and how to avoid it.
+5. The deeper principle that ties it all together.
+
+Build on the short feedback. Do NOT repeat it. Be specific, not generic.`;
+
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: prompt }], 1500); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); fb.expandedLoading = false; rerenderActiveGrade(); return; }
+    raw = '';
+  }
+  fb.expandedLoading = false;
+  fb.expanded = (raw || '').trim() || t('expand.fail');
+  fb.showExpanded = true;
+
+  // Persist back to localStorage so next time you open this drill it remembers
+  if (grade.ts) {
+    updateSession(grade.ts, { breakdown: grade.breakdown });
+  }
+
+  rerenderActiveGrade();
+}
+
+function rerenderActiveGrade() {
+  if (STATE.viewingSession) {
+    renderSessionDetail();
+  } else if (STATE.currentGrade) {
+    const out = document.getElementById('grade-out');
+    if (out) renderScoreCard(out, STATE.currentGrade.breakdown, STATE.currentGrade.score);
+  }
 }
 
 // ============ Voice ============
@@ -998,8 +1143,19 @@ async function onGradeVoice() {
   const result = await gradeAi(transcript, STATE.scenario);
   STATE.busy = false;
   if (!result.parsed) { showGradeError(out, result.raw); return; }
-  const total = (result.parsed.profile || 0) + (result.parsed.root || 0) + (result.parsed.reframe || 0) + (result.parsed.close_dim || 0) + (result.parsed.authority || 0);
-  saveSession({ type: 'voice', scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh), score: total, breakdown: result.parsed, transcript: STATE.voiceTranscript });
+  const total = computeTotal(result.parsed);
+  const ts = Date.now();
+  const sessionData = {
+    ts,
+    type: 'voice',
+    scenario: tx(STATE.scenario.title_en, STATE.scenario.title_zh),
+    scenarioId: STATE.scenario.id,
+    score: total,
+    breakdown: result.parsed,
+    transcript: STATE.voiceTranscript
+  };
+  saveSession(sessionData);
+  STATE.currentGrade = sessionData;
   renderScoreCard(out, result.parsed, total);
 }
 
@@ -1058,16 +1214,72 @@ function renderDashboard() {
   const last7 = sessions.filter(s => Date.now() - s.ts < 7 * 24 * 3600 * 1000).length;
   let weakest = '—';
   if (total > 0) {
-    const sums = { profile: 0, root: 0, reframe: 0, close_dim: 0, authority: 0 };
-    sessions.forEach(s => { const b = s.breakdown || {}; Object.keys(sums).forEach(k => sums[k] += (b[k] || 0)); });
+    const sums = { profile: 0, frame: 0, root: 0, reframe: 0, close_dim: 0, compliance: 0 };
+    const counts = { profile: 0, frame: 0, root: 0, reframe: 0, close_dim: 0, compliance: 0 };
+    sessions.forEach(s => {
+      const b = s.breakdown || {};
+      Object.keys(sums).forEach(k => {
+        if (b[k] !== undefined) { sums[k] += (b[k] || 0); counts[k] += 1; }
+      });
+    });
+    // Compute weakest as average score per dim, only counting dims with data
     let min = Infinity, minKey = null;
-    Object.keys(sums).forEach(k => { if (sums[k] < min) { min = sums[k]; minKey = k; } });
-    const map = { profile: t('rubric.profile'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), authority: t('rubric.authority') };
+    Object.keys(sums).forEach(k => {
+      if (counts[k] > 0) {
+        const avg = sums[k] / counts[k];
+        if (avg < min) { min = avg; minKey = k; }
+      }
+    });
+    const map = { profile: t('rubric.profile'), frame: t('rubric.frame'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), compliance: t('rubric.compliance') };
     weakest = map[minKey] || '—';
   }
   const recent = sessions.slice(0, 10);
-  c.innerHTML = `<div class="stat-row"><div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">${t('stat.total')}</div></div><div class="stat-card"><div class="stat-num">${avg}</div><div class="stat-label">${t('stat.avg')}</div></div><div class="stat-card"><div class="stat-num">${last7}</div><div class="stat-label">${t('stat.last7')}</div></div></div><div class="card"><div class="card-title">${t('weakest.dim')}</div><div class="card-body" style="margin-top:6px;">${weakest}</div><div class="card-meta" style="margin-top:6px;">${t('coach.action')}</div></div><div class="section-title">${t('recent.drills')}</div>${recent.length === 0 ? `<div class="empty">${t('no.records')}</div>` : recent.map(s => `<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><div style="flex:1; min-width:0;"><div class="card-title">${escapeHtml(s.scenario)}</div><div class="card-meta">${s.type === 'voice' ? t('voice.text') : t('chat.text')} · ${formatTs(s.ts)}</div></div><div style="font-size:20px; font-weight:600; color:var(--accent);">${s.score}/10</div></div></div>`).join('')}<div style="height:14px;"></div><button class="btn btn-secondary" id="clear">${t('clear.records')}</button><div style="font-size:11px; color:var(--text-secondary); margin-top:10px; text-align:center;">${t('data.note')}</div>`;
+  c.innerHTML = `<div class="stat-row"><div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">${t('stat.total')}</div></div><div class="stat-card"><div class="stat-num">${avg}</div><div class="stat-label">${t('stat.avg')}</div></div><div class="stat-card"><div class="stat-num">${last7}</div><div class="stat-label">${t('stat.last7')}</div></div></div><div class="card"><div class="card-title">${t('weakest.dim')}</div><div class="card-body" style="margin-top:6px;">${weakest}</div><div class="card-meta" style="margin-top:6px;">${t('coach.action')}</div></div><div class="section-title">${t('recent.drills')}</div>${recent.length === 0 ? `<div class="empty">${t('no.records')}</div>` : recent.map((s, i) => { const m = s.breakdown ? maxScore(s.breakdown) : 10; return `<div class="card session-card" data-idx="${i}" style="cursor:pointer;"><div style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><div style="flex:1; min-width:0;"><div class="card-title">${escapeHtml(s.scenario)}</div><div class="card-meta">${s.type === 'voice' ? t('voice.text') : t('chat.text')} · ${formatTs(s.ts)}</div></div><div style="font-size:20px; font-weight:600; color:var(--accent);">${s.score}/${m}</div></div></div>`; }).join('')}<div style="height:14px;"></div><button class="btn btn-secondary" id="clear">${t('clear.records')}</button><div style="font-size:11px; color:var(--text-secondary); margin-top:10px; text-align:center;">${t('data.note')}</div>`;
   document.getElementById('clear').onclick = () => { if (confirm(t('clear.confirm'))) { localStorage.removeItem(SK.sessions); renderDashboard(); } };
+  document.querySelectorAll('.session-card').forEach(b => {
+    b.onclick = () => {
+      const idx = parseInt(b.getAttribute('data-idx'), 10);
+      STATE.viewingSession = sessions[idx];
+      renderSessionDetail();
+    };
+  });
+}
+
+function renderSessionDetail() {
+  const s = STATE.viewingSession;
+  const c = document.getElementById('content');
+  if (!s) { renderDashboard(); return; }
+  const max = s.breakdown ? maxScore(s.breakdown) : 10;
+  c.innerHTML = `
+    <button class="back-btn" id="back">← ${t('back.dashboard')}</button>
+    <div class="card">
+      <div class="card-title">${escapeHtml(s.scenario)}</div>
+      <div class="card-meta">${s.type === 'voice' ? t('voice.text') : t('chat.text')} · ${formatTs(s.ts)} · ${s.score}/${max}</div>
+    </div>
+    <div class="section-title">${(s.conversation && Array.isArray(s.conversation)) ? t('conversation.label') : t('transcript.label')}</div>
+    <div id="conv-area"></div>
+    <div class="section-title">${t('feedback.title')}</div>
+    <div id="grade-area"></div>
+  `;
+  const convArea = document.getElementById('conv-area');
+  if (s.conversation && Array.isArray(s.conversation)) {
+    convArea.innerHTML = `<div class="chat">${s.conversation.map(m => {
+      const bubble = `<div class="bubble ${m.role}"><div class="bubble-label">${m.role === 'customer' ? (STATE.lang === 'zh' ? '客户' : 'Customer') : (STATE.lang === 'zh' ? '你' : 'You')}</div>${escapeHtml(m.text)}</div>`;
+      const hint = m.hintText ? `<div class="hint-card"><div class="hint-card-label">${t('hint.label')}</div>${escapeHtml(m.hintText)}</div>` : '';
+      return bubble + hint;
+    }).join('')}</div>`;
+  } else if (s.transcript) {
+    convArea.innerHTML = `<pre style="white-space:pre-wrap; font-size:13px; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); line-height:1.55; font-family:inherit;">${escapeHtml(s.transcript)}</pre>`;
+  } else {
+    convArea.innerHTML = `<div class="empty">${t('no.conv')}</div>`;
+  }
+  const gradeArea = document.getElementById('grade-area');
+  if (s.breakdown) {
+    renderScoreCard(gradeArea, s.breakdown, s.score);
+  } else {
+    gradeArea.innerHTML = `<div class="empty">${t('no.conv')}</div>`;
+  }
+  document.getElementById('back').onclick = () => { STATE.viewingSession = null; renderDashboard(); };
 }
 
 // ============ Settings ============
@@ -1095,7 +1307,10 @@ function renderActiveTab() {
   if (STATE.tab === 'roleplay') renderRoleplay();
   else if (STATE.tab === 'voice') renderVoice();
   else if (STATE.tab === 'knowledge') renderKnowledge();
-  else if (STATE.tab === 'dashboard') renderDashboard();
+  else if (STATE.tab === 'dashboard') {
+    if (STATE.viewingSession) renderSessionDetail();
+    else renderDashboard();
+  }
   else if (STATE.tab === 'settings') renderSettings();
 }
 
@@ -1103,6 +1318,7 @@ function setTab(tab) {
   stopRecognition();
   STATE.tab = tab;
   STATE.scenario = null; STATE.conversation = []; STATE.voiceTranscript = ''; STATE.busy = false;
+  STATE.viewingSession = null;
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
   applyHeaderTitle();
   renderActiveTab();

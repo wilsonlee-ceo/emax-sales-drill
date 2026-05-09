@@ -89,6 +89,17 @@ html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFa
 .feedback-section { margin-top: 14px; }
 .feedback-title { font-weight: 600; margin-bottom: 8px; font-size: 13px; }
 .feedback-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 12px; margin-bottom: 8px; font-size: 13px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; line-height: 1.5; }
+.dim-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px; margin-right: 6px; font-weight: 600; letter-spacing: 0.2px; vertical-align: middle; }
+.dim-badge.dim-profile { background: #e3f0fa; color: #1d5a8e; }
+.dim-badge.dim-root { background: #fff4e0; color: #c95f1e; }
+.dim-badge.dim-reframe { background: #f0e6f9; color: #6b2c91; }
+.dim-badge.dim-close_dim { background: #e3f3e7; color: #2d7a4d; }
+.dim-badge.dim-authority { background: #fde8e6; color: #c0392b; }
+.feedback-item.cat-profile { border-left-color: #1d5a8e; }
+.feedback-item.cat-root { border-left-color: #c95f1e; }
+.feedback-item.cat-reframe { border-left-color: #6b2c91; }
+.feedback-item.cat-close_dim { border-left-color: #2d7a4d; }
+.feedback-item.cat-authority { border-left-color: #c0392b; }
 .notice { background: var(--accent-bg); border: 1px solid #f0e1c8; color: #6b4423; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
 .error-box { background: #fde8e6; border: 1px solid #f5b9b3; color: #8a2920; padding: 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 12px; line-height: 1.5; }
 .error-box pre { margin-top: 6px; font-size: 11px; white-space: pre-wrap; background: rgba(0,0,0,0.05); padding: 6px; border-radius: 4px; max-height: 200px; overflow: auto; }
@@ -437,8 +448,41 @@ ${summarizePersonas()}
 === 6R CUSTOMER JOURNEY ===
 ${summarize6R()}
 
-=== MARKET CONTEXT ===
-The market shifted from beauty desire (relationship + package selling worked) to medical trust (regulation, safety, fear conversion, doctor authority required). Sales team is still using old pattern: relationship + soft pressure. Result: low new customer enrollment and rising refunds without service complaints. They need: structured clinical consultant approach, qualified close, compliance-safe wording, named close from 4D library.
+=== MARKET CONTEXT (May 2026 Strategic Diagnosis) ===
+
+Market shift: Aesthetic medical industry has moved from BEAUTY DESIRE (where relationship + package selling worked) to MEDICAL TRUST (where regulation, safety, fear conversion, doctor authority dominate).
+
+Old market customer wanted: results, package, promotion, beauty desire fulfilled.
+New market customer wants: regulation, fear addressed, medical trust, compliance, safety, defensibility.
+
+Sales team's current behaviour (the gap): They are still selling through relationship, explanation, comfort, package pushing. Their default tool is relationship + soft pressure, regardless of customer context.
+
+EVIDENCE OF THE GAP (numbers do not lie):
+- Low consult-to-enrollment conversion for new customers. Means they cannot close without a relationship to lean on.
+- Rising refund rate WITHOUT service complaints. Means they over-pressure existing relationships and customers feel pushed, not served.
+- Pattern shows: 1-tool sales method while sitting on a 40-card 4D library.
+
+THE 7 SPECIFIC GAPS:
+1. They cannot sell SAFETY clearly (know how to sell treatment benefits, not medical safety, screening, suitability, doctor assessment).
+2. They lack COMPLIANCE LANGUAGE (careless wording becomes operational risk - the Harm Door risk).
+3. They OVEREXPLAIN instead of directing (Ren over Ding pattern - too much talking, customer gets info but less certainty).
+4. They lack STRUCTURED QUALIFICATION (do not filter who is suitable, who needs doctor review, who should not proceed).
+5. They are weak at FEAR CONVERSION (do not know how to convert fear into trust through proof and process, only through comfort).
+6. They are still PROMOTION-TRAINED (sell price, package, discount, relationship - not authority, diagnosis, risk control, protocol).
+7. They are not acting as CLINICAL ADVISORY BRIDGE (still behaving as beauty consultants, not as the bridge between customer concern and doctor-led decision).
+
+WHY THIS MATTERS FOR GRADING:
+When you grade, do not only score on tactical 4D moves. Where appropriate, connect a tactical failure to one of these 7 broader gaps. Example: if salesperson over-explains in response to a safety question, this is gap #3 (overexplain instead of directing) and gap #1 (cannot sell safety clearly). Naming the broader gap helps coaches see the pattern, not just the moment.
+
+THE NEW SALES OPERATING SYSTEM THEY NEED:
+1. Approved script (named 4D cards)
+2. Compliance-safe wording
+3. Customer qualification checklist before pricing
+4. Doctor escalation rule (when in doubt, escalate)
+5. Fear handling framework (proof and process, not comfort)
+6. Treatment suitability explanation
+7. Closing script based on safety and trust
+8. Strict control on claims and promises (no medical guarantees)
 
 === YOUR MODES ===
 
@@ -485,6 +529,50 @@ async function callClaude(messages, maxTokens) {
   }
   const data = await response.json();
   return (data.content && data.content[0] && data.content[0].text) || '';
+}
+
+async function translateBatch(items, targetLang) {
+  if (!items || items.length === 0) return null;
+  const langName = targetLang === 'zh' ? 'Chinese (Mandarin, simplified)' : 'English';
+  const prompt = `Translate these ${items.length} items into ${langName}. Preserve meaning and tone. Output ONLY a JSON array of exactly ${items.length} strings, in the same order. No prose, no code fences, no preamble.
+
+${items.map((s, i) => `[${i}] ${s}`).join('\n')}`;
+  let raw = '';
+  try { raw = await callClaude([{ role: 'user', content: prompt }], 2500); }
+  catch (e) { return null; }
+  const a = raw.indexOf('[');
+  const b = raw.lastIndexOf(']');
+  if (a < 0 || b <= a) return null;
+  try {
+    const arr = JSON.parse(raw.slice(a, b + 1));
+    if (Array.isArray(arr) && arr.length === items.length) return arr;
+  } catch (e) {}
+  return null;
+}
+
+async function translateActiveContent(targetLang) {
+  const items = [];
+  const refs = [];
+  if (STATE.tab === 'roleplay' && STATE.scenario && STATE.conversation.length > 0) {
+    STATE.conversation.forEach(m => {
+      if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); }
+      if (m.hintText) { items.push(m.hintText); refs.push({ obj: m, key: 'hintText' }); }
+    });
+  } else if (STATE.tab === 'voice' && STATE.voiceTranscript) {
+    items.push(STATE.voiceTranscript);
+    refs.push({ obj: STATE, key: 'voiceTranscript' });
+  }
+  if (items.length === 0) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'tr-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal" style="text-align:center; padding:24px;"><div class="loading" style="padding:0;">${targetLang === 'zh' ? '翻译中...' : 'Translating...'}</div></div>`;
+  document.body.appendChild(overlay);
+  const translated = await translateBatch(items, targetLang);
+  overlay.remove();
+  if (translated && translated.length === items.length) {
+    refs.forEach((r, i) => { r.obj[r.key] = translated[i]; });
+  }
 }
 
 async function testApiKey(keyValue) {
@@ -539,12 +627,18 @@ function parseGradeJson(s) {
   const fbStart = txt.indexOf('"feedback"');
   if (fbStart >= 0) {
     const after = txt.slice(fbStart);
-    const items = [...after.matchAll(/"((?:[^"\\]|\\.)+?)"/g)];
-    // first match is "feedback" itself, skip it
-    items.slice(1).forEach(m => {
-      const v = m[1].trim();
-      if (v && v.length > 5) feedback.push(v);
-    });
+    // Try new structured format first: {"dim":"...","text":"..."}
+    const objItems = [...after.matchAll(/"dim"\s*:\s*"([^"]+)"\s*,\s*"text"\s*:\s*"((?:[^"\\]|\\.)+?)"/g)];
+    if (objItems.length > 0) {
+      objItems.forEach(m => feedback.push({ dim: m[1], text: m[2] }));
+    } else {
+      // Fall back to old format (array of plain strings)
+      const items = [...after.matchAll(/"((?:[^"\\]|\\.)+?)"/g)];
+      items.slice(1).forEach(m => {
+        const v = m[1].trim();
+        if (v && v.length > 5) feedback.push(v);
+      });
+    }
   }
   scores.feedback = feedback.slice(0, 5);
   return scores;
@@ -709,14 +803,19 @@ async function onGradeRoleplay() {
 
 async function gradeAi(transcript, scenario) {
   const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
-  const userMsg = `[GRADE] Score the SALES side of this conversation against the 4D rubric. Output ONLY valid JSON, no prose, no code fences.
+  const userMsg = `[GRADE] Score the SALES side of this conversation against the 4D rubric. Output ONLY valid JSON. No prose, no code fences, no preamble.
 
 Scenario: ${scenario.title_en}. Customer profile: ${scenario.profile_en}. Concern: ${scenario.concern_en}.
 
 TRANSCRIPT:
 ${transcript}
 
-Feedback in ${langName}. Output exactly 3 feedback points. Each point under 50 words. Each point must cite a specific moment from the transcript and name the 4D card the salesperson should have used.`;
+Output exactly 3 feedback points. Each feedback is an OBJECT with:
+- "dim": exactly one of "profile" | "root" | "reframe" | "close_dim" | "authority"
+- "text": the coaching point in ${langName}, under 60 words. Must cite a specific moment from the transcript, name the 4D card the salesperson should have used, and where relevant connect to one of the 7 May gaps by number (e.g. "(May Gap #2 - lacks compliance language)").
+
+Required JSON format exactly:
+{"profile":N,"root":N,"reframe":N,"close_dim":N,"authority":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}`;
   let raw = '';
   try { raw = await callClaude([{ role: 'user', content: userMsg }], 1500); }
   catch (e) {
@@ -734,8 +833,15 @@ function showGradeError(out, raw) {
 
 function renderScoreCard(container, r, total) {
   const dim = (id, name) => { const v = r[id] || 0; const pct = (v / 2) * 100; return `<div class="score-row"><span>${name}</span><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div><span style="font-weight:600;">${v}/2</span></div>`; };
+  const dimLabels = { profile: t('rubric.profile'), root: t('rubric.root'), reframe: t('rubric.reframe'), close_dim: t('rubric.close'), authority: t('rubric.authority') };
   const fb = (r.feedback || []);
-  const fbHtml = fb.length ? fb.map(f => `<div class="feedback-item">${escapeHtml(f)}</div>`).join('') : `<div class="feedback-item">${t('fb.placeholder1')}</div>`;
+  const fbHtml = fb.length ? fb.map(f => {
+    if (typeof f === 'string') return `<div class="feedback-item">${escapeHtml(f)}</div>`;
+    const d = f.dim || '';
+    const label = dimLabels[d] || d;
+    const badge = d ? `<span class="dim-badge dim-${escapeHtml(d)}">${label}</span>` : '';
+    return `<div class="feedback-item cat-${escapeHtml(d)}">${badge}${escapeHtml(f.text || f.comment || '')}</div>`;
+  }).join('') : `<div class="feedback-item">${t('fb.placeholder1')}</div>`;
   container.innerHTML = `<div class="card" style="margin-top:14px;"><div class="card-title">${t('total.score')} ${total}/10</div><div class="card-meta">${t('recorded')}</div><hr class="sep">${dim('profile', t('rubric.profile'))}${dim('root', t('rubric.root'))}${dim('reframe', t('rubric.reframe'))}${dim('close_dim', t('rubric.close'))}${dim('authority', t('rubric.authority'))}<div class="feedback-section"><div class="feedback-title">${t('feedback.title')}</div>${fbHtml}</div></div>`;
 }
 
@@ -910,12 +1016,19 @@ function applyHeaderTitle() {
   document.documentElement.lang = STATE.lang === 'zh' ? 'zh-CN' : 'en';
 }
 
-function setLang(l) {
+async function setLang(l) {
+  if (STATE.lang === l) return;
   STATE.lang = l; saveLang(l);
   document.getElementById('lang-en').classList.toggle('active', l === 'en');
   document.getElementById('lang-zh').classList.toggle('active', l === 'zh');
   applyHeaderTitle();
-  setTab(STATE.tab);
+  // If active session has dynamic AI content, translate it before re-render
+  const hasDynamic = (STATE.tab === 'roleplay' && STATE.scenario && STATE.conversation.length > 0) || (STATE.tab === 'voice' && STATE.voiceTranscript);
+  if (hasDynamic && loadKey()) {
+    await translateActiveContent(l);
+  }
+  // Re-render current tab without resetting scenario state
+  renderActiveTab();
 }
 
 // ============ Init ============

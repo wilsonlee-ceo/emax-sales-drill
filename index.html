@@ -124,6 +124,8 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 .say-more-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .expanded-feedback { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; line-height: 1.65; color: #4a4a4a; white-space: pre-wrap; }
 .expanded-feedback-loading { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-secondary); text-align: center; }
+.card-tag { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; font-size: 11px; padding: 3px 10px; background: var(--accent-bg); color: var(--accent); border-radius: 10px; margin-top: -4px; margin-bottom: 6px; font-weight: 500; }
+.card-tag::before { content: '🎴'; font-size: 11px; }
 .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .modal { background: var(--surface); border-radius: var(--radius); padding: 20px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
 .modal h2 { font-size: 17px; margin-bottom: 8px; }
@@ -147,7 +149,7 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
   <div id="content" class="content"></div>
   <div class="tabbar">
     <button class="tab active" data-tab="roleplay"><span class="tab-icon">💬</span><span class="tab-label" data-i18n="tab.roleplay">Roleplay</span></button>
-    <button class="tab" data-tab="voice"><span class="tab-icon">🎙</span><span class="tab-label" data-i18n="tab.voice">Voice</span></button>
+    <button class="tab" data-tab="voice"><span class="tab-icon">🪞</span><span class="tab-label" data-i18n="tab.voice">Demo</span></button>
     <button class="tab" data-tab="knowledge"><span class="tab-icon">📚</span><span class="tab-label" data-i18n="tab.knowledge">Cards</span></button>
     <button class="tab" data-tab="dashboard"><span class="tab-icon">📊</span><span class="tab-label" data-i18n="tab.dashboard">Coach</span></button>
     <button class="tab" data-tab="settings"><span class="tab-icon">⚙️</span><span class="tab-label" data-i18n="tab.settings">Settings</span></button>
@@ -160,13 +162,20 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 const I18N = {
   en: {
     'header.roleplay':  ['Roleplay', 'Practice until reflex'],
-    'header.voice':     ['Voice Drill', 'Speak it, do not just think it'],
+    'header.voice':     ['Demo Mode', 'You play customer. Watch the AI consultant work.'],
     'header.knowledge': ['Cards', '4D Closing System and 6R Journey'],
     'header.dashboard': ['Coach', 'Numbers do not lie'],
     'header.settings':  ['Settings', 'API key and preferences'],
-    'tab.roleplay': 'Roleplay', 'tab.voice': 'Voice', 'tab.knowledge': 'Cards', 'tab.dashboard': 'Coach', 'tab.settings': 'Settings',
+    'tab.roleplay': 'Roleplay', 'tab.voice': 'Demo', 'tab.knowledge': 'Cards', 'tab.dashboard': 'Coach', 'tab.settings': 'Settings',
     'roleplay.intro': 'Pick a customer scenario. AI plays the customer in English. End the drill to get scored on the 4D rubric.',
-    'voice.intro': 'Pick a scenario. Speak how you would respond. AI transcribes and scores your delivery. Mic permission required. Best on Chrome or Safari.',
+    'voice.intro': 'Pick a customer persona to roleplay AS. Then watch the AI consultant respond using the 4D system. Each response shows which card was used.',
+    'demo.youplay': 'You play this customer',
+    'demo.consultantTag': 'Consultant',
+    'demo.youTag': 'You (customer)',
+    'demo.cardLabel': 'Card used',
+    'demo.startReply': 'Speak as this customer. Mention your concern.',
+    'demo.greetingEn': 'Hi, welcome to Emax. What brings you in today?',
+    'demo.greetingZh': '您好 欢迎光临 您今天想了解哪方面',
     'change.scenario': '← Change scenario', 'concern': 'Concern',
     'reply.placeholder': 'How do you respond',
     'btn.send': 'Send', 'btn.end_score': 'End and grade',
@@ -243,9 +252,16 @@ const I18N = {
     'header.knowledge': ['卡片库', '4D 成交系统 和 6R 旅程'],
     'header.dashboard': ['教练看板', '数据不会撒谎'],
     'header.settings':  ['设置', 'API 密钥和偏好'],
-    'tab.roleplay': '演练', 'tab.voice': '录音', 'tab.knowledge': '卡片', 'tab.dashboard': '看板', 'tab.settings': '设置',
+    'tab.roleplay': '演练', 'tab.voice': '示范', 'tab.knowledge': '卡片', 'tab.dashboard': '看板', 'tab.settings': '设置',
     'roleplay.intro': '选一个场景。AI 用中文扮演客户和你对话。结束后按 4D 评分。',
-    'voice.intro': '选一个场景。用普通话讲出你的回应。AI 会转录并评分。需要麦克风权限。',
+    'voice.intro': '选一个客户角色扮演。AI 会用 4D 系统作为顾问回应。每次回复会标注用了哪张卡。',
+    'demo.youplay': '你扮演这个客户',
+    'demo.consultantTag': '顾问',
+    'demo.youTag': '你 (客户)',
+    'demo.cardLabel': '用了哪张卡',
+    'demo.startReply': '用这个客户的口吻 说出你的关注点',
+    'demo.greetingEn': 'Hi, welcome to Emax. What brings you in today?',
+    'demo.greetingZh': '您好 欢迎光临 您今天想了解哪方面',
     'change.scenario': '← 换场景', 'concern': '关注点',
     'reply.placeholder': '你怎么回应',
     'btn.send': '发送', 'btn.end_score': '结束评分',
@@ -598,8 +614,32 @@ In each feedback item, name the dimension (profile/root/reframe/close_dim/author
 
 === YOUR MODES ===
 
-MODE A - CUSTOMER ROLEPLAY:
-When the user message starts with [ROLEPLAY] or asks you to play a customer, stay in character. Reply naturally, 1-3 sentences. Push back authentically. Do not break character. Do not give advice. Do not explain you are AI. Use the language requested. Do not prefix your reply with "Customer:" or anything similar.
+MODE A - CUSTOMER ROLEPLAY (STRICT):
+
+You are the CUSTOMER seeking aesthetic medical consultation. You are NEVER the salesperson, NEVER the consultant, NEVER a "helpful assistant".
+
+ABSOLUTE RULES (do not break, ever):
+1. Stay in character as the customer no matter what the salesperson says.
+2. NEVER offer plans, packages, treatments, or recommendations. That is the salesperson's job, not yours.
+3. NEVER ask the salesperson "what would you like to improve" or "what can I help you with" or similar consultant-type questions.
+4. NEVER thank the salesperson for coming. NEVER welcome them. The customer is the one being served, not the one serving.
+5. NEVER say things like "the fact you came today means you've made up your mind" or "let's spend a few minutes understanding what you want to improve". That is consultant speak.
+6. Reply 1-3 sentences, natural, like a real customer. Push back, doubt, ask follow-ups. You are not easily sold to.
+7. Use the language specified in the user message. Do not switch languages mid-conversation.
+8. Do not prefix your reply with "Customer:" or "客户:" or any tag.
+
+WHEN THE SALESPERSON SAYS WEIRD OR NONSENSE THINGS:
+You stay in character as a confused, slightly impatient customer. You do NOT take over and become helpful.
+
+Examples of weird salesperson input and how the customer should respond:
+
+- Salesperson: "Yes" → Customer: "Yes to what? I haven't asked you anything yet." or "嗯？我又没问你东西。"
+- Salesperson: "Hello hello hello" → Customer: "Hi... were you going to say something?" or "你好... 你想说什么吗"
+- Salesperson: random gibberish → Customer: "Sorry, I didn't catch that. Can you say it again?" or "不好意思 我没听懂 你能再说一次吗"
+- Salesperson: "OK" alone → Customer: "OK what? You haven't told me anything." or "OK 什么 你还没说"
+- Salesperson: just an emoji → Customer: gives a confused look, says nothing or "你在干嘛"
+
+You stay in your customer character. You do NOT rescue the conversation by becoming the consultant.
 
 MODE B - SALES COACH GRADER:
 When the user message starts with [GRADE] or asks for grading, score the SALES side of the transcript on 6 dimensions, each 0, 1, or 2:
@@ -613,7 +653,40 @@ When the user message starts with [GRADE] or asks for grading, score the SALES s
 Then write 3 specific improvement points using the multi-path teaching format from TEACHING PHILOSOPHY.
 
 CRITICAL: When grading, output ONLY valid JSON. No prose. No code fences. No preamble. Format exactly:
-{"profile":N,"frame":N,"root":N,"reframe":N,"close_dim":N,"compliance":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}`;
+{"profile":N,"frame":N,"root":N,"reframe":N,"close_dim":N,"compliance":N,"feedback":[{"dim":"...","text":"..."},{"dim":"...","text":"..."},{"dim":"...","text":"..."}]}
+
+MODE C - SENIOR CONSULTANT DEMONSTRATION:
+
+When the user message starts with [CONSULTANT_DEMO] or asks you to play the consultant, you become the senior Emax consultant with 10+ years experience demonstrating perfect execution of the 4D Closing System. The trainee is roleplaying as the customer.
+
+Your job:
+- Be the senior consultant they should aspire to be
+- Use the FRAME -> VALUE -> ROOT -> CLOSE sequence cleanly. Pick the right card for each moment.
+- Stay compliance-safe (no medical guarantees, no "we promise X result", escalate to doctor when appropriate)
+- 1 to 3 sentences usually. Slightly longer (4-5) when explaining a treatment or value.
+- Match the customer's emotional state. If they are angry, calm authority. If they are crying, containment. If they are challenging, demonstrate, not defend.
+- Reply in the language specified.
+
+CRITICAL OUTPUT FORMAT FOR MODE C:
+ALWAYS end your response with a card tag on a NEW LINE, in this exact format:
+<<Card: [card name]>>
+
+Where card name is the specific 4D card you primarily used in this turn. Pick from the actual library:
+- FRAME cards: "Authoritative Framing", "Pain Uncovering + Future Painting", "Value Anchoring + ROI", "Strong Technical Explanation", "Competitive Framing", "Empowerment Framing"
+- VALUE cards: "Treatment Plan", "Timeline", "Social Proof", "Customisation", "Premium Standard & Brand", "Guidance"
+- ROOT cards: "Root Card 1 - Fear of Wasting Money", "Root Card 2 - Fear of No Results", "Root Card 3 - Fear of Commitment", "Root Card 4 - Need to Ask Husband", "Root Card 5 - Not Emotionally Ready", "Root Card 6 - Don't Trust Clinics"
+- CLOSING cards: "Choice Close", "Goal Anchored Close", "Silence Close", "Assumptive Close", "Priority Close", "Value Ladder Close", "Soft Close (Enrollment)", "Reservation Close (Deposit)", "Future Close", "Walkaway Authority Close"
+- ELITE REFRAME: "Elite Reframe 1" through "Elite Reframe 10" (or paraphrase the script)
+- JOKER: "4S Emotional Disarm", "10 Rules of Elite Sales"
+- For early greeting/listening: "Active Listening" or "Welcome / Reassure"
+
+If you used multiple cards, name the PRIMARY one for that turn.
+
+Example output:
+"I hear you. Many of our customers feel the same way at first. Tell me, when did this start to bother you the most?
+<<Card: Pain Uncovering + Future Painting>>"
+
+Stay strict on format. The trainee sees the card tag as a learning marker.`;
 }
 
 const SYSTEM_PROMPT = buildSystemPrompt();
@@ -691,11 +764,14 @@ async function translateActiveContent(targetLang) {
     if (STATE.currentGrade && STATE.currentGrade.breakdown) {
       pushFeedback(STATE.currentGrade.breakdown.feedback);
     }
-  } else if (STATE.tab === 'voice' && STATE.voiceTranscript) {
-    items.push(STATE.voiceTranscript);
-    refs.push({ obj: STATE, key: 'voiceTranscript' });
-    if (STATE.currentGrade && STATE.currentGrade.breakdown) {
-      pushFeedback(STATE.currentGrade.breakdown.feedback);
+  } else if (STATE.tab === 'voice' && STATE.scenario && STATE.conversation.length > 0) {
+    // Demo mode: translate conversation messages (consultant + customer-user)
+    STATE.conversation.forEach(m => {
+      if (m.text) { items.push(m.text); refs.push({ obj: m, key: 'text' }); }
+    });
+    if (STATE.pendingReplyText) {
+      items.push(STATE.pendingReplyText);
+      refs.push({ obj: STATE, key: 'pendingReplyText' });
     }
   } else if (STATE.tab === 'dashboard' && STATE.viewingSession) {
     const s = STATE.viewingSession;
@@ -1131,21 +1207,77 @@ function rerenderActiveGrade() {
 
 // ============ Voice ============
 function renderVoice() {
+  // Voice tab is now Consultant Demo mode: user plays customer, AI plays consultant.
   const c = document.getElementById('content');
   if (!STATE.scenario) {
     const noKey = !loadKey() ? `<div class="error-box">${t('no.key')}</div>` : '';
     const lvlBar = `<div class="cat-row" style="margin-bottom:10px;"><button class="cat-chip ${STATE.scenarioLevel === 1 ? 'active' : ''}" data-level="1">${t('lvl.l1')}</button><button class="cat-chip ${STATE.scenarioLevel === 2 ? 'active' : ''}" data-level="2">${t('lvl.l2')}</button><button class="cat-chip ${STATE.scenarioLevel === 3 ? 'active' : ''}" data-level="3">${t('lvl.l3')}</button></div>`;
     const filtered = SCENARIOS.filter(s => s.level === STATE.scenarioLevel);
-    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('customer.opens')}: ${tx(s.open_en, s.open_zh)}</div></button>`).join('')}</div>`;
+    c.innerHTML = `${noKey}<div class="notice">${t('voice.intro')}</div>${lvlBar}<div class="scenario-grid">${filtered.map(s => `<button class="scenario-card" data-scen="${s.id}"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body">${t('concern')}: ${tx(s.concern_en, s.concern_zh)}</div></button>`).join('')}</div>`;
     c.querySelectorAll('[data-level]').forEach(b => { b.onclick = () => { STATE.scenarioLevel = parseInt(b.getAttribute('data-level'), 10); renderVoice(); }; });
-    c.querySelectorAll('.scenario-card').forEach(b => { b.onclick = () => { const id = b.getAttribute('data-scen'); STATE.scenario = SCENARIOS.find(s => s.id === id); STATE.voiceTranscript = ''; renderVoice(); }; });
+    c.querySelectorAll('.scenario-card').forEach(b => {
+      b.onclick = () => {
+        const id = b.getAttribute('data-scen');
+        STATE.scenario = SCENARIOS.find(s => s.id === id);
+        const greeting = STATE.lang === 'zh' ? t('demo.greetingZh') : t('demo.greetingEn');
+        STATE.conversation = [{ role: 'consultant', text: greeting, card: 'Welcome / Reassure' }];
+        renderVoice();
+      };
+    });
     return;
   }
   const s = STATE.scenario;
-  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">L${s.level}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${t('customer.opens')}</div><div class="card-body">${tx(s.open_en, s.open_zh)}</div></div><div style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;">${t('live.transcript')}</div><div class="transcript" id="transcript">${escapeHtml(STATE.voiceTranscript) || `<span style="color:var(--text-secondary);">${t('transcript.placeholder')}</span>`}</div><button class="btn" id="recbtn">${STATE.recording ? `<span class="recording-pulse"></span>${t('btn.stop_record')}` : t('btn.start_record')}</button><div style="height:8px;"></div><button class="btn btn-secondary" id="gradevoice" ${STATE.voiceTranscript && !STATE.busy ? '' : 'disabled'}>${t('btn.submit_grade')}</button><div id="grade-out"></div>`;
-  document.getElementById('back').onclick = () => { stopRecognition(); STATE.scenario = null; STATE.voiceTranscript = ''; STATE.recording = false; renderVoice(); };
-  document.getElementById('recbtn').onclick = toggleRecord;
-  document.getElementById('gradevoice').onclick = onGradeVoice;
+  const renderMsg = (m) => {
+    if (m.role === 'consultant') {
+      const bubble = `<div class="bubble customer"><div class="bubble-label">${t('demo.consultantTag')}</div>${escapeHtml(m.text)}</div>`;
+      const tag = m.card ? `<div class="card-tag">${escapeHtml(m.card)}</div>` : '';
+      return bubble + tag;
+    }
+    return `<div class="bubble staff"><div class="bubble-label">${t('demo.youTag')}</div>${escapeHtml(m.text)}</div>`;
+  };
+  c.innerHTML = `<button class="back-btn" id="back">${t('change.scenario')}</button><div class="card"><div><span class="level-pill level-${s.level}">${s.src}</span><span style="font-weight:600;">${tx(s.title_en, s.title_zh)}</span></div><div class="card-meta" style="margin-top:4px;">${t('demo.youplay')}</div><div class="card-body">${tx(s.profile_en, s.profile_zh)}</div><div class="card-body" style="margin-top:6px;"><span style="color:var(--text-secondary);">${t('concern')}:</span> ${tx(s.concern_en, s.concern_zh)}</div></div><div class="chat" id="chat">${STATE.conversation.map(renderMsg).join('')}</div><textarea class="textarea" id="reply" placeholder="${t('demo.startReply')}"></textarea><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn btn-secondary" id="mic-btn" style="flex:1; padding:12px 8px;">${STATE.recording ? `<span class="recording-pulse"></span>${t('mic.stop')}` : t('mic.start')}</button><button class="btn" id="send" style="flex:2;" ${STATE.busy ? 'disabled' : ''}>${t('btn.send')}</button></div>`;
+  document.getElementById('back').onclick = () => { stopRecognition(); STATE.scenario = null; STATE.conversation = []; renderVoice(); };
+  document.getElementById('send').onclick = () => { stopRecognition(); onSendDemoReply(); };
+  document.getElementById('mic-btn').onclick = toggleRecordForReply;
+  setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50);
+}
+
+async function onSendDemoReply() {
+  if (STATE.busy) return;
+  const ta = document.getElementById('reply');
+  const text = (ta.value || '').trim();
+  if (!text) return;
+  STATE.conversation.push({ role: 'customer-user', text });
+  STATE.busy = true;
+  renderVoice();
+  const c = document.getElementById('content');
+  c.insertAdjacentHTML('beforeend', `<div class="loading" id="lo">${STATE.lang === 'zh' ? '顾问思考中...' : 'Consultant thinking...'}</div>`);
+  const langName = STATE.lang === 'zh' ? 'Chinese' : 'English';
+  const sys = `[CONSULTANT_DEMO] You are the senior Emax consultant. The trainee is roleplaying as customer persona: ${STATE.scenario.src} - ${STATE.scenario.title_en}. Profile: ${STATE.scenario.profile_en}. Concern: ${STATE.scenario.concern_en}. Reply in ${langName}. Use the 4D system. End your reply with a card tag on a new line: <<Card: card name>>.`;
+  const messages = [{ role: 'user', content: sys }];
+  STATE.conversation.forEach((m, i) => {
+    if (i === 0 && m.role === 'consultant') {
+      messages.push({ role: 'assistant', content: m.text + (m.card ? '\n<<Card: ' + m.card + '>>' : '') });
+    } else if (m.role === 'customer-user') {
+      messages.push({ role: 'user', content: m.text });
+    } else {
+      messages.push({ role: 'assistant', content: m.text + (m.card ? '\n<<Card: ' + m.card + '>>' : '') });
+    }
+  });
+  let raw = '';
+  try { raw = await callClaude(messages, 600); }
+  catch (e) {
+    if (e.message === 'NO_KEY') { showApiKeyModal(false); STATE.busy = false; renderVoice(); return; }
+    raw = '';
+  }
+  raw = (raw || '').trim();
+  const cardMatch = raw.match(/<<Card:\s*([^>]+)>>/);
+  const card = cardMatch ? cardMatch[1].trim() : '';
+  const cleanText = raw.replace(/<<Card:[^>]+>>\s*$/m, '').trim();
+  STATE.conversation.push({ role: 'consultant', text: cleanText || '...', card });
+  if (ta) ta.value = '';
+  STATE.busy = false;
+  renderVoice();
 }
 
 function stopRecognition() { if (STATE.recognition) { try { STATE.recognition.stop(); } catch (e) {} STATE.recognition = null; } STATE.recording = false; }
@@ -1438,7 +1570,7 @@ async function setLang(l) {
   const replyEl = document.getElementById('reply');
   STATE.pendingReplyText = replyEl ? (replyEl.value || '') : '';
   // If active session has dynamic AI content (or typed reply), translate it before re-render
-  const hasDynamic = (STATE.tab === 'roleplay' && STATE.scenario && (STATE.conversation.length > 0 || STATE.pendingReplyText || (STATE.currentGrade && STATE.currentGrade.breakdown))) || (STATE.tab === 'voice' && (STATE.voiceTranscript || (STATE.currentGrade && STATE.currentGrade.breakdown))) || (STATE.tab === 'dashboard' && STATE.viewingSession);
+  const hasDynamic = (STATE.tab === 'roleplay' && STATE.scenario && (STATE.conversation.length > 0 || STATE.pendingReplyText || (STATE.currentGrade && STATE.currentGrade.breakdown))) || (STATE.tab === 'voice' && STATE.scenario && (STATE.conversation.length > 0 || STATE.pendingReplyText)) || (STATE.tab === 'dashboard' && STATE.viewingSession);
   if (hasDynamic && loadKey()) {
     await translateActiveContent(l);
   }
